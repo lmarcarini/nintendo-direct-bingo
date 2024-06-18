@@ -1,5 +1,6 @@
 import { useState } from "react";
 import "./App.css";
+import DOMPurify from 'dompurify'; 
 
 function App() {
   const searchParams = new URL(window.location.href).searchParams;
@@ -56,8 +57,8 @@ function App() {
               data-name={item.index}
               contentEditable={viewState == "edit"}
               className="bingo-input"
+              dangerouslySetInnerHTML={{__html: DOMPurify.sanitize(item.value || "")}}
             >
-              {item.value}
             </div>
           ))}
         </div>
@@ -82,15 +83,14 @@ function App() {
           </button>
         )}
       </div>
-      {viewState == "edit" && (
-        <fieldset className="options-fieldset">
+        <fieldset className="options-fieldset" hidden={viewState !== "edit"}>
           <legend>Selecione o número de items:</legend>
           <select onChange={onChangeNInputs}>
             <option value={16}>16</option>
             <option value={25}>25</option>
           </select>
         </fieldset>
-      )}
+      
     </div>
   );
 }

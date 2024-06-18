@@ -85,7 +85,7 @@ function App() {
       </div>
         <fieldset className="options-fieldset" hidden={viewState !== "edit"}>
           <legend>Selecione o número de items:</legend>
-          <select onChange={onChangeNInputs}>
+          <select onChange={onChangeNInputs} defaultValue={nInputs}>
             <option value={16}>16</option>
             <option value={25}>25</option>
           </select>

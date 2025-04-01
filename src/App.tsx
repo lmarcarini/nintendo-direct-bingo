@@ -95,6 +95,7 @@ function App() {
               dangerouslySetInnerHTML={{
                 __html: DOMPurify.sanitize(item.value || ""),
               }}
+              spellCheck="false"
             ></div>
           ))}
         </div>

@@ -91,11 +91,16 @@ h1 {
   overflow: hidden;
 }
 
+.bingo-input[contenteditable="false"]{
+  user-select: none;
+}
+
 .bingo-card{
   padding: 2.5rem 2rem;
   background-color: #fe0016;
   border-radius: 16px;
 }
+
 
 .content-wrapper{
   display: flex;

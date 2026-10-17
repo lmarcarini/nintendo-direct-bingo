@@ -35,7 +35,7 @@ function App() {
     adjustFontSize(square);
   };
 
-  const onToogleView = () => {
+  const onToggleView = () => {
     const newViewState = viewState === "edit" ? "preview" : "edit";
     setView(newViewState);
     updateUrl((params) => params.set("view", newViewState));
@@ -45,19 +45,23 @@ function App() {
     const squares = bingoRefs.current
       .slice(0, nInputs)
       .filter((ref): ref is HTMLDivElement => ref != null);
-    const adjustAllFontSizes = () => squares.forEach(adjustFontSize);
 
-    // Run immediately after DOM is painted
-    adjustAllFontSizes();
-
-    // Also adjust when the squares resize
-    const resizeObserver = new ResizeObserver(adjustAllFontSizes);
+    // Fires once on observe, then whenever the squares resize
+    const resizeObserver = new ResizeObserver(() =>
+      squares.forEach(adjustFontSize)
+    );
     squares.forEach((square) => resizeObserver.observe(square));
 
     return () => resizeObserver.disconnect();
   }, [nInputs]); // Re-run so newly shown squares are observed
 
   const onClear = () => {
+    // The URL is the only copy of the card, so there is no undo
+    if (
+      values.current.some(Boolean) &&
+      !window.confirm("Clear every square on the card?")
+    )
+      return;
     values.current.fill("");
     bingoRefs.current.forEach((ref) => {
       if (ref) {
@@ -87,7 +91,10 @@ function App() {
               onInput={onChangeItem}
               key={index}
               data-name={index}
-              contentEditable={viewState == "edit" ? "plaintext-only" : false}
+              contentEditable={viewState === "edit" ? "plaintext-only" : false}
+              role="textbox"
+              aria-multiline="true"
+              aria-label={`Square ${index + 1}`}
               className="bingo-input"
               spellCheck="false"
             ></div>
@@ -95,38 +102,30 @@ function App() {
         </div>
       </div>
       <div className="button-wrapper">
-        {viewState == "edit" && (
-          <>
-            {" "}
-            <button
-              type="button"
-              onClick={onToogleView}
-              className="button button-primary"
-            >
-              View
-            </button>
-            <button
-              type="button"
-              onClick={onClear}
-              className="button button-secondary"
-            >
-              Clear
-            </button>
-          </>
-        )}
-        {viewState == "preview" && (
+        <button
+          type="button"
+          onClick={onToggleView}
+          className="button button-primary"
+        >
+          {viewState === "edit" ? "View" : "Edit"}
+        </button>
+        {viewState === "edit" && (
           <button
             type="button"
-            onClick={onToogleView}
-            className="button button-primary"
+            onClick={onClear}
+            className="button button-secondary"
           >
-            Edit
+            Clear
           </button>
         )}
       </div>
       <fieldset className="options-fieldset" hidden={viewState !== "edit"}>
-        <legend>Select the number of items:</legend>
-        <select onChange={onChangeNInputs} defaultValue={nInputs}>
+        <legend id="n-items-label">Select the number of items:</legend>
+        <select
+          onChange={onChangeNInputs}
+          defaultValue={nInputs}
+          aria-labelledby="n-items-label"
+        >
           <option value={16}>16</option>
           <option value={25}>25</option>
         </select>

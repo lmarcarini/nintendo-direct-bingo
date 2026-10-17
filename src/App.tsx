@@ -85,7 +85,9 @@ function App() {
         <div className={`bingo-wrapper bingo-wrapper--${nInputs}-items`}>
           {inputList.slice(0, nInputs).map((item, index) => (
             <div
-              ref={(el) => (bingoRefs.current[index] = el)}
+              ref={(el) => {
+                bingoRefs.current[index] = el;
+              }}
               suppressContentEditableWarning={true}
               onInput={onChangeItem}
               key={item.index}

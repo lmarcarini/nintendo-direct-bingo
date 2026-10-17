@@ -305,6 +305,50 @@ h1 {
   height: 1.15em;
 }
 
+/* Read by screen readers, not shown */
+.visually-hidden{
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+/* The viewer's own setting, not the card's, so it sits outside the options
+   and shows in view mode too */
+.language-picker{
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4rem;
+  padding: 0.3rem 0.75rem;
+  border-radius: 999px;
+  background-color: color-mix(in srgb, var(--page-text) 6%, transparent);
+  color: var(--page-text);
+  font-size: 0.9rem;
+}
+
+.language-picker:has(:focus-visible){
+  outline: 2px dashed var(--page-text);
+  outline-offset: 2px;
+}
+
+.language-select{
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-weight: 600;
+  cursor: pointer;
+  outline: none;
+}
+
+.language-select option{
+  background-color: var(--page-bg);
+  color: var(--page-text);
+}
+
 .options{
   /* Resolved here, so theme chips (which set their own colors) still get
      the page's */

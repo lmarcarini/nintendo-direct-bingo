@@ -5,6 +5,9 @@ export const THEMES = [
   { id: "playstation", label: "PlayStation" },
   { id: "xbox", label: "Xbox" },
   { id: "game-awards", label: "The Game Awards" },
+  { id: "rgb", label: "RGB Battlestation" },
+  { id: "neo-tokyo", label: "Neo Tokyo Arcade" },
+  { id: "white-build", label: "White Build" },
 ] as const;
 
 export type Theme = (typeof THEMES)[number]["id"];

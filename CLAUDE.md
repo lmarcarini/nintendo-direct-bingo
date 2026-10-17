@@ -22,9 +22,10 @@ React 19, TypeScript (strict), Vite 8 with `@vitejs/plugin-react`, ESLint 10 fla
 ## Layout
 
 - `src/main.tsx`: awaits `readCard` (decompression is async), then renders `App` with the decoded card.
-- `src/App.tsx`: the whole app (title, squares, marks, buttons, options).
-- `src/themes.ts`: theme ids and labels. Each id has a `:root[data-theme="…"]` block in `index.css` that overrides the color custom properties; `App` sets `data-theme` on `<html>`.
+- `src/App.tsx`: the whole app (title, squares, marks, buttons, options panel, celebrations).
+- `src/themes.ts`: theme ids and labels. Each id has a `[data-theme="…"]` block in `index.css` that overrides the color custom properties; `App` sets `data-theme` on `<html>`. The blocks aren't limited to `:root` so the theme picker chips can each show their own theme's colors; effects that should only apply to the page use `:root[data-theme="…"]`.
 - `src/utils/cardUrl.ts`: the `Card` type and reading/writing it to the URL.
+- `src/utils/completions.ts`: which rows, columns, diagonals or full card ("bingo") a new mark just completed, given the card's celebration settings.
 - `src/utils/adjustFontSize.ts`: binary-searches the largest font size (8–36px) at which a square's text fits, breaking words only when one is too long even at 8px. It measures overflow via `scrollHeight`/`scrollWidth`, so it depends on `.bingo-input` using `justify-content: safe center` (plain `center` spills overflow upwards, where it isn't measured).
 - `src/index.css`: all styles (theme variables, layout, card, grid, marks, buttons, Gilroy font).
 - `public/`: `Gilroy-Bold.woff` (title font) and `letter-b-16.ico` (favicon).
@@ -41,6 +42,9 @@ The URL is the only persistence (`src/utils/cardUrl.ts`). The whole card is one 
 | `v`  | `"p"` for view mode (default edit)                         |
 | `th` | theme id from `themes.ts` (default `nintendo`)             |
 | `m`  | marks bitmask, bit i = square i hit                        |
+| `a`  | `0` turns celebrations off (default on)                    |
+| `dg` | `1` makes diagonals count as lines (default off)           |
+| `el` | `1` celebrates every new line, not only the first (default off) |
 
 - Backward compatibility with old links is not a goal. Changing the format is fine.
 - `App` holds the card in one `useState<Card>`, and an effect calls `writeCard` whenever it changes. `writeCard` uses `history.replaceState` (no history entry per keystroke) and drops a write if a newer one started while it was compressing.
@@ -48,6 +52,8 @@ The URL is the only persistence (`src/utils/cardUrl.ts`). The whole card is one 
 - Squares and the title are uncontrolled `contentEditable="plaintext-only"` elements. React does not own their content: a ref callback (`fillOnce`) fills `textContent` once when the element mounts, and `onInput` reads `innerText` back into the card state. Don't render their text as React children; React would clash with the browser's edits.
 - Content is only ever set with `textContent`, never `innerHTML`. Links are shared, so the URL is untrusted input; keep it that way.
 - View mode turns off `contentEditable`, hides the edit controls, and makes squares buttons (`role="button"`, `aria-pressed`) that toggle marks on click, Enter or Space. Marks live in the URL, so a shared link carries them.
+- Celebration settings are part of the card, so everyone with the link plays by the same rules.
+- A mark that completes a row, a column, a diagonal (if enabled) or the whole card shows a full-screen `.celebration` overlay (one per completion, queued in `App`). It's styled per theme in `index.css` from the theme colors, with extra effects for some themes, and is removed when its `celebration-fade` animation ends.
 
 ## Roadmap
 

@@ -24,8 +24,7 @@ React 19, TypeScript (strict), Vite 8 with `@vitejs/plugin-react`, ESLint 10 fla
 - `src/App.tsx`: the whole app (card, buttons, size selector).
 - `src/utils/cardUrl.ts`: reading and writing the card to the URL.
 - `src/utils/adjustFontSize.ts`: binary-searches the largest font size (8–36px) at which a square's text fits, breaking words only when one is too long even at 8px. It measures overflow via `scrollHeight`/`scrollWidth`, so it depends on `.bingo-input` using `justify-content: safe center` (plain `center` spills overflow upwards, where it isn't measured).
-- `src/index.css`: all the real styles (card, grid, buttons, Gilroy font).
-- `src/App.css`: leftover Vite template CSS (`.logo`, `.card`, `.read-the-docs`). Only `#root` is used.
+- `src/index.css`: all styles (layout, card, grid, buttons, Gilroy font).
 - `public/`: `Gilroy-Bold.woff` (title font) and `letter-b-16.ico` (favicon).
 
 ## How state works

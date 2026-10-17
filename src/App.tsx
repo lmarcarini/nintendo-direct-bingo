@@ -1,80 +1,73 @@
 import { useEffect, useRef, useState } from "react";
 import "./App.css";
-import DOMPurify from "dompurify";
 import { adjustFontSize } from "./utils/adjustFontSize";
+import {
+  MAX_SQUARES,
+  readCard,
+  setSquare,
+  updateUrl,
+  type View,
+} from "./utils/cardUrl";
 
-const searchParams = new URL(window.location.href).searchParams;
+const initialCard = readCard(new URL(window.location.href));
 
-const inputList = new Array(25).fill(null).map((_, i) => {
-  const encodedValue = searchParams.get(i.toString());
-  return {
-    index: i,
-    value: encodedValue ? DOMPurify.sanitize(atob(encodedValue)) : "",
-  };
-});
+// Squares already filled with their saved text, so re-renders don't reset them
+const filledSquares = new WeakSet<HTMLDivElement>();
 
 function App() {
-  const [viewState, setView] = useState(searchParams.get("view") || "edit");
-  const [nInputs, setNInputs] = useState(+(searchParams.get("nItems") || 16));
+  const [viewState, setView] = useState<View>(initialCard.view);
+  const [nInputs, setNInputs] = useState(initialCard.nItems);
+  // Current text of every square, including ones hidden when showing 16
+  const values = useRef(initialCard.values);
+  const bingoRefs = useRef<(HTMLDivElement | null)[]>([]);
 
   const onChangeNInputs = (e: React.ChangeEvent<HTMLSelectElement>) => {
     const curNInputs = e.currentTarget.value;
     setNInputs(+curNInputs);
-    const url = new URL(window.location.href);
-    url.searchParams.set("nItems", curNInputs);
-    window.history.pushState({}, "", url);
+    updateUrl((params) => params.set("nItems", curNInputs));
   };
 
   const onChangeItem = (e: React.FormEvent<HTMLDivElement>) => {
-    const nItem = e.currentTarget.dataset.name;
-    const value = DOMPurify.sanitize(e.currentTarget.innerHTML);
-    if (nItem == null) return;
-
-    const url = new URL(window.location.href);
-    url.searchParams.set(nItem.toString(), btoa(value));
-    window.history.pushState({}, "", url);
-    adjustFontSize(e.currentTarget);
+    const square = e.currentTarget;
+    const index = Number(square.dataset.name);
+    const text = square.innerText.trim();
+    values.current[index] = text;
+    updateUrl((params) => setSquare(params, index, text));
+    adjustFontSize(square);
   };
 
   const onToogleView = () => {
     const newViewState = viewState === "edit" ? "preview" : "edit";
     setView(newViewState);
-    const url = new URL(window.location.href);
-    url.searchParams.set("view", newViewState);
-    window.history.pushState({}, "", url);
+    updateUrl((params) => params.set("view", newViewState));
   };
 
-  const bingoRefs = useRef<(HTMLDivElement | null)[]>([]);
   useEffect(() => {
-    const adjustAllFontSizes = () => {
-      bingoRefs.current.forEach((ref) => {
-        if (ref) adjustFontSize(ref);
-      });
-    };
+    const squares = bingoRefs.current
+      .slice(0, nInputs)
+      .filter((ref): ref is HTMLDivElement => ref != null);
+    const adjustAllFontSizes = () => squares.forEach(adjustFontSize);
 
     // Run immediately after DOM is painted
     adjustAllFontSizes();
 
-    // Also adjust when window resizes (optional)
+    // Also adjust when the squares resize
     const resizeObserver = new ResizeObserver(adjustAllFontSizes);
-    bingoRefs.current.forEach((ref) => {
-      if (ref) {
-        resizeObserver.observe(ref);
-      }
-    });
+    squares.forEach((square) => resizeObserver.observe(square));
 
     return () => resizeObserver.disconnect();
-  }, []); // Re-run when view or number of items changes
+  }, [nInputs]); // Re-run so newly shown squares are observed
 
   const onClear = () => {
+    values.current.fill("");
     bingoRefs.current.forEach((ref) => {
-      const url = new URL(window.location.href);
       if (ref) {
-        ref.innerHTML = "";
-        const name = ref.dataset.name;
-        if (name) url.searchParams.delete(name);
+        ref.textContent = "";
+        adjustFontSize(ref);
       }
-      window.history.pushState({}, "", url);
+    });
+    updateUrl((params) => {
+      for (let i = 0; i < MAX_SQUARES; i++) setSquare(params, i, "");
     });
   };
 
@@ -83,20 +76,20 @@ function App() {
       <div className="bingo-card">
         <h1>Nintendo Direct Bingo</h1>
         <div className={`bingo-wrapper bingo-wrapper--${nInputs}-items`}>
-          {inputList.slice(0, nInputs).map((item, index) => (
+          {Array.from({ length: nInputs }, (_, index) => (
             <div
               ref={(el) => {
                 bingoRefs.current[index] = el;
+                if (el && !filledSquares.has(el)) {
+                  filledSquares.add(el);
+                  el.textContent = values.current[index];
+                }
               }}
-              suppressContentEditableWarning={true}
               onInput={onChangeItem}
-              key={item.index}
-              data-name={item.index}
-              contentEditable={viewState == "edit"}
+              key={index}
+              data-name={index}
+              contentEditable={viewState == "edit" ? "plaintext-only" : false}
               className="bingo-input"
-              dangerouslySetInnerHTML={{
-                __html: DOMPurify.sanitize(item.value || ""),
-              }}
               spellCheck="false"
             ></div>
           ))}

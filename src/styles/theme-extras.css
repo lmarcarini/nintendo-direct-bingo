@@ -1,0 +1,152 @@
+/* Theme extras: effects that go beyond swapping colors */
+
+@property --spin-angle {
+  syntax: "<angle>";
+  inherits: false;
+  initial-value: 0deg;
+}
+
+@keyframes spin-angle {
+  to { --spin-angle: 360deg; }
+}
+
+@keyframes rgb-scroll {
+  to { background-position-x: 400px; }
+}
+
+@keyframes rgb-hue {
+  to { filter: hue-rotate(360deg); }
+}
+
+@keyframes neon-flicker {
+  0%, 90%, 94%, 100% { opacity: 1; }
+  92% { opacity: 0.55; }
+  96% { opacity: 0.8; }
+}
+
+[data-theme="rgb"] {
+  --rgb-colors: #ff0040, #ff8a00, #ffe600, #00ff6a, #00c8ff, #7a00ff, #ff00c8, #ff0040;
+}
+
+/* Rainbow border plus a blurred copy behind it as the underglow */
+:root[data-theme="rgb"] .bingo-card {
+  position: relative;
+  border: 3px solid transparent;
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    conic-gradient(from var(--spin-angle), var(--rgb-colors)) border-box;
+}
+
+:root[data-theme="rgb"] .bingo-card::before {
+  content: "";
+  position: absolute;
+  inset: -3px;
+  z-index: -1;
+  border-radius: inherit;
+  background: conic-gradient(from var(--spin-angle), var(--rgb-colors));
+  filter: blur(20px);
+  opacity: 0.6;
+}
+
+:root[data-theme="rgb"] h1,
+:root[data-theme="rgb"] .celebration-text {
+  background: linear-gradient(90deg, var(--rgb-colors)) 0 0 / 400px 100%;
+  background-clip: text;
+  color: transparent;
+  caret-color: #fff;
+  text-shadow: none;
+  filter: drop-shadow(-0.06em 0.06em 0 #2a0030);
+}
+
+:root[data-theme="rgb"] .bingo-input {
+  box-shadow: inset 0 0 0 1px #2e2e42;
+}
+
+:root[data-theme="rgb"] .bingo-input--marked {
+  box-shadow: 0 0 14px var(--mark-bg);
+}
+
+:root[data-theme="neo-tokyo"] {
+  background-image: radial-gradient(ellipse at top, #2c0b4d, transparent 70%);
+}
+
+:root[data-theme="neo-tokyo"] .bingo-card {
+  border: 2px solid #ff2a6d;
+  box-shadow:
+    0 0 12px #ff2a6d,
+    0 0 40px rgb(255 42 109 / 0.45),
+    inset 0 0 24px rgb(255 42 109 / 0.3);
+}
+
+/* Thin strokes like neon tubes; Gilroy only comes in bold */
+:root[data-theme="neo-tokyo"] h1 {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-weight: 300;
+  text-shadow:
+    0 0 4px #fff,
+    0 0 10px #ff2a6d,
+    0 0 22px #ff2a6d,
+    0 0 42px #ff2a6d;
+}
+
+:root[data-theme="neo-tokyo"] .bingo-input {
+  box-shadow:
+    inset 0 0 0 1px #05d9e8,
+    0 0 8px rgb(5 217 232 / 0.5);
+  font-weight: 500;
+  text-shadow: 0 0 6px rgb(5 217 232 / 0.7);
+}
+
+:root[data-theme="neo-tokyo"] .bingo-input--marked {
+  box-shadow: 0 0 16px #ff2a6d;
+  text-shadow: none;
+}
+
+:root[data-theme="neo-tokyo"] .button {
+  box-shadow:
+    0 var(--button-lift) 0 var(--button-depth),
+    0 0 14px color-mix(in srgb, var(--button-depth) 55%, transparent);
+}
+
+:root[data-theme="white-build"] .bingo-card {
+  box-shadow:
+    0 0 0 1px #dbe2ea,
+    0 12px 32px rgb(29 39 51 / 0.1),
+    0 20px 40px -14px rgb(110 185 255 / 0.7);
+}
+
+:root[data-theme="white-build"] .bingo-input {
+  box-shadow: inset 0 0 0 1px #dbe2ea;
+}
+
+:root[data-theme="white-build"] .bingo-input--marked {
+  box-shadow:
+    inset 0 0 0 2px #4fb3ff,
+    0 0 12px rgb(79 179 255 / 0.6);
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  :root[data-theme="rgb"] .bingo-card,
+  :root[data-theme="rgb"] .bingo-card::before {
+    animation: spin-angle 4s linear infinite;
+  }
+
+  :root[data-theme="rgb"] h1 {
+    animation: rgb-scroll 3s linear infinite;
+  }
+
+  :root[data-theme="rgb"] .celebration-text {
+    animation:
+      celebration-pop var(--celebration-duration) both,
+      rgb-scroll 1s linear infinite;
+  }
+
+  /* Hue rotation leaves the black text black */
+  :root[data-theme="rgb"] .bingo-input--marked {
+    animation: rgb-hue 4s linear infinite;
+  }
+
+  :root[data-theme="neo-tokyo"] h1 {
+    animation: neon-flicker 6s linear infinite;
+  }
+}

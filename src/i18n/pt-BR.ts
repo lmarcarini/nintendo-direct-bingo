@@ -1,4 +1,4 @@
-import type { Messages } from ".";
+import type { Messages } from "./messages";
 
 export const ptBR: Messages = {
   celebrations: {

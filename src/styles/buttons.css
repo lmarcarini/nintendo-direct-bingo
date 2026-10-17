@@ -1,0 +1,86 @@
+/* Share buttons on the left, card actions on the right; they wrap onto
+   two rows on narrow screens */
+.button-wrapper{
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+}
+
+.button-group{
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.button-group--end{
+  margin-inline-start: auto;
+}
+
+@keyframes notice-pop {
+  from { opacity: 0; translate: -50% 0.75rem; }
+}
+
+/* Floating toast, so showing it doesn't shift the buttons around */
+.share-notice:not(:empty){
+  position: fixed;
+  bottom: 1.5rem;
+  left: 50%;
+  translate: -50% 0;
+  z-index: 5;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.55rem 1rem;
+  border-radius: 999px;
+  background-color: var(--page-text);
+  color: var(--page-bg);
+  box-shadow: 0 6px 20px rgb(0 0 0 / 0.3);
+  font-size: 0.9rem;
+  font-weight: 600;
+  white-space: nowrap;
+  animation: notice-pop 0.2s ease-out;
+}
+
+/* Chunky buttons in the card's colors, with a solid edge underneath (like
+   the title's shadow) that they press down into */
+.button{
+  --button-depth: var(--title-shadow);
+  --button-lift: 3px;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.4em;
+  padding: 0.5rem 0.9rem;
+  border: none;
+  border-radius: 10px;
+  background-color: var(--card-bg);
+  color: var(--title-text);
+  box-shadow: 0 var(--button-lift) 0 var(--button-depth);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.2;
+  cursor: pointer;
+  transition: translate 0.08s, box-shadow 0.08s;
+}
+
+.button:hover{
+  --button-lift: 4px;
+  translate: 0 -1px;
+}
+
+.button:active{
+  --button-lift: 1px;
+  translate: 0 2px;
+}
+
+.button:focus-visible{
+  outline: 2px solid var(--page-text);
+  outline-offset: 3px;
+}
+
+.button-primary{
+  --button-depth: color-mix(in srgb, var(--mark-bg) 55%, #000);
+  background-color: var(--mark-bg);
+  color: var(--mark-text);
+}

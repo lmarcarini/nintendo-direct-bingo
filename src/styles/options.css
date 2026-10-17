@@ -1,0 +1,107 @@
+.options{
+  /* Resolved here, so theme chips (which set their own colors) still get
+     the page's */
+  --options-ring: var(--page-text);
+  --options-gap: var(--page-bg);
+  --options-line: color-mix(in srgb, var(--page-text) 12%, transparent);
+  border-radius: 16px;
+  background-color: color-mix(in srgb, var(--page-text) 6%, transparent);
+  text-align: left;
+}
+
+.options-summary{
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.9rem 1.25rem;
+  border-radius: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  list-style: none;
+}
+
+.options-summary::-webkit-details-marker{
+  display: none;
+}
+
+.options-summary::after{
+  content: "";
+  width: 0.5em;
+  height: 0.5em;
+  border-right: 2px solid currentColor;
+  border-bottom: 2px solid currentColor;
+  rotate: 45deg;
+  translate: 0 -0.15em;
+  transition: rotate 0.15s, translate 0.15s;
+}
+
+.options[open] > .options-summary::after{
+  rotate: 225deg;
+  translate: 0 0.15em;
+}
+
+.options-summary:focus-visible{
+  outline: 2px dashed var(--options-ring);
+  outline-offset: 2px;
+}
+
+.options-body{
+  display: grid;
+  gap: 1.25rem;
+  padding: 0.25rem 1.25rem 1.25rem;
+}
+
+.options-group{
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  border: none;
+}
+
+.options-group > legend{
+  padding: 0;
+  margin-bottom: 0.5rem;
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+/* A label with a radio stretched invisibly over it */
+.option-choice{
+  position: relative;
+  cursor: pointer;
+}
+
+.option-radio{
+  position: absolute;
+  inset: 0;
+  margin: 0;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.option-choice:has(:focus-visible){
+  outline: 2px dashed var(--options-ring);
+  outline-offset: 2px;
+}
+
+.segmented{
+  display: inline-flex;
+  gap: 3px;
+  padding: 3px;
+  border-radius: 10px;
+  background-color: var(--options-line);
+}
+
+.segmented .option-choice{
+  padding: 0.3rem 1rem;
+  border-radius: 7px;
+  font-weight: 600;
+}
+
+.segmented .option-choice:has(:checked){
+  background-color: var(--card-bg);
+  color: var(--title-text);
+}

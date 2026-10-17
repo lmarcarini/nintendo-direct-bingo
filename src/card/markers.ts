@@ -1,6 +1,6 @@
 // What's drawn on top of a marked square. Each id other than "none" has a
-// `[data-marker="…"]` block in index.css; "theme" picks a different marker
-// per theme. Labels are translated, in src/i18n
+// `[data-marker="…"]` block in styles/markers.css; "theme" picks a
+// different marker per theme. Labels are translated, in src/i18n
 export const MARKERS = [
   "none",
   "theme",

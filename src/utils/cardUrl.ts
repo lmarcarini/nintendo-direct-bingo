@@ -20,6 +20,9 @@ export type Card = {
   view: View;
   theme: Theme;
   marks: number; // bit i set = square i marked as a hit
+  animations: boolean; // full-screen celebrations
+  diagonals: boolean; // diagonal lines celebrate too
+  everyLine: boolean; // celebrate each new line, not only the first
 };
 
 type Payload = {
@@ -29,6 +32,9 @@ type Payload = {
   v?: "p"; // preview
   th?: string; // theme
   m?: number; // marks
+  a?: 0; // animations off
+  dg?: 1; // diagonals
+  el?: 1; // every line
 };
 
 export const isMarked = (marks: number, index: number) =>
@@ -44,6 +50,9 @@ const toPayload = (card: Card): Payload => {
   if (card.view === "preview") payload.v = "p";
   if (card.theme !== DEFAULT_THEME) payload.th = card.theme;
   if (card.marks) payload.m = card.marks;
+  if (!card.animations) payload.a = 0;
+  if (card.diagonals) payload.dg = 1;
+  if (card.everyLine) payload.el = 1;
   return payload;
 };
 
@@ -64,6 +73,9 @@ const fromPayload = (data: unknown): Card => {
     marks: Number.isInteger(payload.m)
       ? (payload.m as number) & ((1 << MAX_SQUARES) - 1)
       : 0,
+    animations: payload.a !== 0,
+    diagonals: payload.dg === 1,
+    everyLine: payload.el === 1,
   };
 };
 

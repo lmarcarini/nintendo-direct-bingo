@@ -1,5 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
-import { THEMES, type Theme } from "./themes";
+import { THEMES } from "./themes";
 import { adjustFontSize } from "./utils/adjustFontSize";
 import {
   DEFAULT_TITLE,
@@ -8,6 +8,14 @@ import {
   writeCard,
   type Card,
 } from "./utils/cardUrl";
+import { newCompletions, type Completion } from "./utils/completions";
+
+const CELEBRATION_TEXT: Record<Completion, string> = {
+  row: "Row!",
+  column: "Column!",
+  diagonal: "Diagonal!",
+  bingo: "Bingo!",
+};
 
 // Editable elements already filled with their saved text, so re-renders
 // don't reset them (React doesn't own their content, the browser does)
@@ -19,9 +27,45 @@ const fillOnce = (element: HTMLElement | null, text: string) => {
   }
 };
 
+function Switch({
+  label,
+  hint,
+  checked,
+  disabled,
+  onChange,
+}: {
+  label: string;
+  hint: string;
+  checked: boolean;
+  disabled?: boolean;
+  onChange: (checked: boolean) => void;
+}) {
+  return (
+    <label className="switch">
+      <span className="switch-text">
+        <span className="switch-label">{label}</span>
+        <span className="switch-hint">{hint}</span>
+      </span>
+      <input
+        type="checkbox"
+        role="switch"
+        className="switch-input"
+        checked={checked}
+        disabled={disabled}
+        onChange={(e) => onChange(e.currentTarget.checked)}
+      />
+    </label>
+  );
+}
+
 function App({ initialCard }: { initialCard: Card }) {
   const [card, setCard] = useState(initialCard);
   const bingoRefs = useRef<(HTMLDivElement | null)[]>([]);
+  // Queue of full-screen animations; the first one is showing
+  const [celebrations, setCelebrations] = useState<
+    { id: number; kind: Completion }[]
+  >([]);
+  const nextCelebrationId = useRef(0);
   const isEditing = card.view === "edit";
 
   const update = (patch: Partial<Card>) =>
@@ -80,8 +124,16 @@ function App({ initialCard }: { initialCard: Card }) {
     }
   };
 
-  const toggleMark = (index: number) =>
-    setCard((current) => ({ ...current, marks: current.marks ^ (1 << index) }));
+  const toggleMark = (index: number) => {
+    const marks = card.marks ^ (1 << index);
+    update({ marks });
+    if (!card.animations || !isMarked(marks, index)) return;
+    const kinds = newCompletions(marks, index, card.nItems, card);
+    if (kinds.length)
+      setCelebrations(
+        kinds.map((kind) => ({ id: nextCelebrationId.current++, kind }))
+      );
+  };
 
   const onSquareKeyDown = (
     index: number,
@@ -188,36 +240,93 @@ function App({ initialCard }: { initialCard: Card }) {
           </button>
         )}
       </div>
-      <fieldset className="options-fieldset" hidden={!isEditing}>
-        <legend>Card options</legend>
-        <label>
-          Squares{" "}
-          <select
-            value={card.nItems}
-            onChange={(e) =>
-              update({ nItems: e.currentTarget.value === "25" ? 25 : 16 })
-            }
-          >
-            <option value={16}>16</option>
-            <option value={25}>25</option>
-          </select>
-        </label>
-        <label>
-          Theme{" "}
-          <select
-            value={card.theme}
-            onChange={(e) =>
-              update({ theme: e.currentTarget.value as Theme })
-            }
-          >
-            {THEMES.map((theme) => (
-              <option key={theme.id} value={theme.id}>
-                {theme.label}
-              </option>
-            ))}
-          </select>
-        </label>
-      </fieldset>
+      <details className="options" hidden={!isEditing}>
+        <summary className="options-summary">Card options</summary>
+        <div className="options-body">
+          <fieldset className="options-group">
+            <legend>Squares</legend>
+            <div className="segmented">
+              {([16, 25] as const).map((n) => (
+                <label key={n} className="option-choice">
+                  <input
+                    type="radio"
+                    name="squares"
+                    className="option-radio"
+                    checked={card.nItems === n}
+                    onChange={() => update({ nItems: n })}
+                  />
+                  {n === 16 ? "4 × 4" : "5 × 5"}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset className="options-group">
+            <legend>Theme</legend>
+            <div className="theme-picker">
+              {THEMES.map((theme) => (
+                // data-theme gives the chip that theme's colors
+                <label
+                  key={theme.id}
+                  data-theme={theme.id}
+                  className="option-choice theme-chip"
+                >
+                  <input
+                    type="radio"
+                    name="theme"
+                    className="option-radio"
+                    checked={card.theme === theme.id}
+                    onChange={() => update({ theme: theme.id })}
+                  />
+                  <span className="theme-chip-swatch" aria-hidden="true">
+                    <span></span>
+                    <span></span>
+                  </span>
+                  {theme.label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset className="options-group">
+            <legend>Celebrations</legend>
+            <Switch
+              label="Animations"
+              hint="Full-screen animation when you complete a line or the card"
+              checked={card.animations}
+              onChange={(animations) => update({ animations })}
+            />
+            <Switch
+              label="Diagonals"
+              hint="Diagonal lines count as lines"
+              checked={card.diagonals}
+              disabled={!card.animations}
+              onChange={(diagonals) => update({ diagonals })}
+            />
+            <Switch
+              label="Every line"
+              hint="Celebrate each new line, not only the first"
+              checked={card.everyLine}
+              disabled={!card.animations}
+              onChange={(everyLine) => update({ everyLine })}
+            />
+          </fieldset>
+        </div>
+      </details>
+      {celebrations.length > 0 && (
+        <div
+          key={celebrations[0].id}
+          role="status"
+          className={`celebration celebration--${celebrations[0].kind}`}
+          onAnimationEnd={(e) => {
+            // Ignore the decorations' animations, only the overlay's own fade
+            if (e.animationName === "celebration-fade")
+              setCelebrations((queue) => queue.slice(1));
+          }}
+        >
+          <span className="celebration-text">
+            {CELEBRATION_TEXT[celebrations[0].kind]}
+          </span>
+        </div>
+      )}
     </div>
   );
 }

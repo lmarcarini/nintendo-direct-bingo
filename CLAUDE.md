@@ -17,7 +17,7 @@ Node version comes from `.nvmrc` (24 LTS); run `nvm use`. `package.json` `engine
 
 ## Stack
 
-React 19, TypeScript (strict), Vite 8 with `@vitejs/plugin-react`, ESLint 10 flat config (`eslint.config.js`). No runtime dependencies besides React. It is a static client-only app with no backend.
+React 19, TypeScript (strict), Vite 8 with `@vitejs/plugin-react`, ESLint 10 flat config (`eslint.config.js`). The only runtime dependency besides React is `modern-screenshot` (the "Copy image" and share screenshots), which is loaded with a dynamic `import()` so it stays out of the main bundle. It is a static client-only app with no backend.
 
 ## Layout
 
@@ -26,6 +26,7 @@ React 19, TypeScript (strict), Vite 8 with `@vitejs/plugin-react`, ESLint 10 fla
 - `src/themes.ts`: theme ids and labels. Each id has a `[data-theme="…"]` block in `index.css` that overrides the color custom properties; `App` sets `data-theme` on `<html>`. The blocks aren't limited to `:root` so the theme picker chips can each show their own theme's colors; effects that should only apply to the page use `:root[data-theme="…"]`.
 - `src/utils/cardUrl.ts`: the `Card` type and reading/writing it to the URL.
 - `src/utils/completions.ts`: which rows, columns, diagonals or full card ("bingo") a new mark just completed, given the card's celebration settings.
+- `src/utils/share.ts`: screenshot of `.bingo-card` (PNG at 2×), copying it or the link to the clipboard, and the Web Share API (the Share button only shows where `navigator.share` exists; it attaches the screenshot where `navigator.canShare` accepts files). `copyImage` takes a `Promise<Blob>` so the clipboard write starts inside the click, which Safari requires.
 - `src/utils/adjustFontSize.ts`: binary-searches the largest font size (8–36px) at which a square's text fits, breaking words only when one is too long even at 8px. It measures overflow via `scrollHeight`/`scrollWidth`, so it depends on `.bingo-input` using `justify-content: safe center` (plain `center` spills overflow upwards, where it isn't measured).
 - `src/index.css`: all styles (theme variables, layout, card, grid, marks, buttons, Gilroy font).
 - `public/`: `Gilroy-Bold.woff` (title font) and `letter-b-16.ico` (favicon).

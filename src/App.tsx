@@ -9,6 +9,13 @@ import {
   type Card,
 } from "./utils/cardUrl";
 import { newCompletions, type Completion } from "./utils/completions";
+import {
+  canShare,
+  cardImage,
+  copyImage,
+  copyLink,
+  share,
+} from "./utils/share";
 
 const CELEBRATION_TEXT: Record<Completion, string> = {
   row: "Row!",
@@ -26,6 +33,48 @@ const fillOnce = (element: HTMLElement | null, text: string) => {
     element.textContent = text;
   }
 };
+
+// Stroke icons on a 24×24 grid, drawn in the text color
+const ICONS = {
+  image: [
+    "M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2Z",
+    "M7 9a2 2 0 1 0 4 0a2 2 0 1 0-4 0",
+    "m21 15-5-5L5 21",
+  ],
+  link: [
+    "M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71",
+    "M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71",
+  ],
+  share: ["M12 3v12", "m7 8 5-5 5 5", "M5 12v7a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-7"],
+  eye: [
+    "M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12Z",
+    "M9 12a3 3 0 1 0 6 0a3 3 0 1 0-6 0",
+  ],
+  pencil: ["M17 3l4 4L8 20H4v-4Z"],
+  trash: ["M3 6h18", "M8 6V4h8v2", "M6 6l1 14h10l1-14"],
+  undo: ["M3 12a9 9 0 1 0 3-6.7L3 8", "M3 3v5h5"],
+  check: ["M20 6 9 17l-5-5"],
+  alert: ["M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0", "M12 8v4", "M12 16h.01"],
+};
+
+function Icon({ name }: { name: keyof typeof ICONS }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      className="icon"
+      aria-hidden="true"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    >
+      {ICONS[name].map((d) => (
+        <path key={d} d={d} />
+      ))}
+    </svg>
+  );
+}
 
 function Switch({
   label,
@@ -61,6 +110,11 @@ function Switch({
 function App({ initialCard }: { initialCard: Card }) {
   const [card, setCard] = useState(initialCard);
   const bingoRefs = useRef<(HTMLDivElement | null)[]>([]);
+  const cardRef = useRef<HTMLDivElement>(null);
+  // Short message after a share action; a new object restarts its timer
+  const [notice, setNotice] = useState<{ text: string; ok: boolean } | null>(
+    null
+  );
   // Queue of full-screen animations; the first one is showing
   const [celebrations, setCelebrations] = useState<
     { id: number; kind: Completion }[]
@@ -83,6 +137,12 @@ function App({ initialCard }: { initialCard: Card }) {
   useEffect(() => {
     document.title = card.title || DEFAULT_TITLE;
   }, [card.title]);
+
+  useEffect(() => {
+    if (!notice) return;
+    const timeout = setTimeout(() => setNotice(null), 2500);
+    return () => clearTimeout(timeout);
+  }, [notice]);
 
   useEffect(() => {
     const squares = bingoRefs.current
@@ -167,9 +227,38 @@ function App({ initialCard }: { initialCard: Card }) {
     if (window.confirm("Unmark every square?")) update({ marks: 0 });
   };
 
+  const notify = async (action: Promise<void>, done: string, failed: string) => {
+    try {
+      await action;
+      setNotice({ text: done, ok: true });
+    } catch (error) {
+      // Closing the share sheet isn't an error
+      if (error instanceof DOMException && error.name === "AbortError") return;
+      console.error(error);
+      setNotice({ text: failed, ok: false });
+    }
+  };
+
+  const onCopyImage = () =>
+    notify(
+      copyImage(cardImage(cardRef.current!)),
+      "Image copied",
+      "Couldn't copy the image"
+    );
+
+  const onCopyLink = () =>
+    notify(copyLink(), "Link copied", "Couldn't copy the link");
+
+  const onShare = () =>
+    notify(
+      share(card.title || DEFAULT_TITLE, cardImage(cardRef.current!)),
+      "Shared",
+      "Couldn't share the card"
+    );
+
   return (
     <div className="content-wrapper">
-      <div className="bingo-card">
+      <div ref={cardRef} className="bingo-card">
         <h1
           ref={(el) => fillOnce(el, card.title)}
           contentEditable={isEditing ? "plaintext-only" : false}
@@ -214,31 +303,72 @@ function App({ initialCard }: { initialCard: Card }) {
         </div>
       </div>
       <div className="button-wrapper">
-        {!isEditing && card.marks !== 0 && (
+        <div className="button-group">
           <button
             type="button"
-            onClick={onClearMarks}
+            onClick={onCopyImage}
             className="button button-secondary"
           >
-            Clear marks
+            <Icon name="image" />
+            Copy image
           </button>
-        )}
-        <button
-          type="button"
-          onClick={onToggleView}
-          className="button button-primary"
-        >
-          {isEditing ? "View" : "Edit"}
-        </button>
-        {isEditing && (
           <button
             type="button"
-            onClick={onClear}
+            onClick={onCopyLink}
             className="button button-secondary"
           >
-            Clear
+            <Icon name="link" />
+            Copy link
           </button>
-        )}
+          {canShare && (
+            <button
+              type="button"
+              onClick={onShare}
+              className="button button-secondary"
+            >
+              <Icon name="share" />
+              Share
+            </button>
+          )}
+          <span role="status" className="share-notice">
+            {notice && (
+              <>
+                <Icon name={notice.ok ? "check" : "alert"} />
+                {notice.text}
+              </>
+            )}
+          </span>
+        </div>
+        <div className="button-group button-group--end">
+          {!isEditing && card.marks !== 0 && (
+            <button
+              type="button"
+              onClick={onClearMarks}
+              className="button button-secondary"
+            >
+              <Icon name="undo" />
+              Clear marks
+            </button>
+          )}
+          <button
+            type="button"
+            onClick={onToggleView}
+            className="button button-primary"
+          >
+            <Icon name={isEditing ? "eye" : "pencil"} />
+            {isEditing ? "View" : "Edit"}
+          </button>
+          {isEditing && (
+            <button
+              type="button"
+              onClick={onClear}
+              className="button button-secondary"
+            >
+              <Icon name="trash" />
+              Clear
+            </button>
+          )}
+        </div>
       </div>
       <details className="options" hidden={!isEditing}>
         <summary className="options-summary">Card options</summary>

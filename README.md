@@ -4,11 +4,12 @@ A small web app for making bingo cards before a Nintendo Direct. Fill the square
 
 ## How it works
 
-1. Open the app and pick a 4×4 (16) or 5×5 (25) card.
-2. Click any square and type your prediction. Text shrinks to fit the square.
+1. Open the app and pick a 4×4 (16) or 5×5 (25) card and a color theme.
+2. Click the title to rename the card, and click any square to type a prediction. Text shrinks to fit the square.
 3. Press **View** to lock the card, then copy the URL and send it to your friends.
+4. During the Direct, click (or tap) squares in view mode to mark what got announced.
 
-The URL holds the whole card. Nothing is stored on a server, so whoever has the link has the card.
+The URL holds the whole card, including the title, theme and marks. Nothing is stored on a server, so whoever has the link has the card.
 
 ## Running locally
 
@@ -29,8 +30,8 @@ React 19, TypeScript, Vite 8. No backend.
 
 ## Roadmap
 
-- [ ] **Themes**: pick a color scheme for your card
-- [ ] **Editable title**: replace "Nintendo Direct Bingo" with your own title
-- [ ] **Better URL saving**: shorter share links (emoji and other characters already work)
-- [ ] **Mark matches**: click squares in view mode to mark what got announced
+- [x] **Themes**: pick a color scheme for your card
+- [x] **Editable title**: replace "Nintendo Direct Bingo" with your own title
+- [x] **Better URL saving**: the whole card is compressed into one shorter link
+- [x] **Mark matches**: click squares in view mode to mark what got announced
 - [ ] **Rooms**: a shared room over WebSockets so friends can play together live

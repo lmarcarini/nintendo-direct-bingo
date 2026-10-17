@@ -12,6 +12,8 @@
   --square-text: #213547;
   --mark-bg: #ffd400;
   --mark-text: #213547;
+  /* Checkmark and thumbs up markers */
+  --marker-color: var(--title-shadow);
 }
 
 :root {
@@ -94,6 +96,7 @@
   --square-text: #1d2733;
   --mark-bg: #8fd0ff;
   --mark-text: #0d1b2a;
+  --marker-color: #1f7fd1;
   color-scheme: light;
 }
 
@@ -177,6 +180,12 @@ h1 {
   resize: none;
   border-radius: 5px;
   overflow: hidden;
+}
+
+/* Markers are positioned in the square's corner */
+.bingo-input,
+.marker-preview > span{
+  position: relative;
 }
 
 .bingo-input[contenteditable="false"]{
@@ -426,7 +435,8 @@ h1 {
   text-align: center;
 }
 
-.theme-chip:has(:checked){
+.theme-chip:has(:checked),
+.marker-chip:has(:checked){
   box-shadow: 0 0 0 2px var(--options-gap), 0 0 0 4px var(--options-ring);
 }
 
@@ -451,6 +461,33 @@ h1 {
     linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
     conic-gradient(var(--rgb-colors)) border-box;
   border: 2px solid transparent;
+}
+
+.marker-picker{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+  gap: 0.5rem;
+}
+
+.marker-chip{
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 0.4rem;
+  padding: 0.6rem 0.4rem;
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px var(--options-line);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.marker-preview > span{
+  display: block;
+  width: 2.5rem;
+  aspect-ratio: 1;
+  border-radius: 5px;
 }
 
 .switch{
@@ -525,6 +562,100 @@ h1 {
 .switch-input:focus-visible{
   outline: 2px solid var(--options-ring);
   outline-offset: 2px;
+}
+
+/* Markers: drawn in the corner of marked squares, like the beans on a
+   bingo card. Each one is an SVG mask (black = drawn) filled with
+   --marker-paint and multiplied with the square, so text under it stays
+   readable */
+
+/* Grows in rather than shrinking in: a marker sticking out of its square
+   would count as overflow in adjustFontSize and shrink the text */
+@keyframes marker-drop {
+  from { scale: 0.3; opacity: 0; }
+}
+
+[data-marker] .bingo-input--marked::after{
+  content: "";
+  position: absolute;
+  right: 5%;
+  bottom: 5%;
+  width: 40%;
+  height: 40%;
+  pointer-events: none;
+  background: var(--marker-paint, var(--marker-color));
+  mask: var(--marker-shape) center / contain no-repeat;
+  mix-blend-mode: var(--marker-blend, multiply);
+}
+
+[data-marker="check"]{
+  --marker-shape: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M20 6 9 17l-5-5' fill='none' stroke='%23000' stroke-width='3.2' stroke-linecap='round' stroke-linejoin='round'/></svg>");
+}
+
+/* Maru, the Japanese "correct" circle, in the red ink it's marked with */
+[data-marker="circle"]{
+  --marker-color: #e60012;
+  --marker-shape: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><circle cx='12' cy='12' r='9' fill='none' stroke='%23000' stroke-width='2.8'/></svg>");
+}
+
+[data-marker="thumbs"]{
+  --marker-shape: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='%23000' fill-opacity='.3' stroke='%23000' stroke-width='2' stroke-linecap='round' stroke-linejoin='round'><path d='M7 10v12'/><path d='M15 5.88 14 10h5.83a2 2 0 0 1 1.92 2.56l-2.33 8A2 2 0 0 1 17.5 22H4a2 2 0 0 1-2-2v-8a2 2 0 0 1 2-2h2.76a2 2 0 0 0 1.79-1.11L12 2a3.13 3.13 0 0 1 3 3.88Z'/></g></svg>");
+}
+
+/* A real bean, in full color, that covers what's under it like on paper */
+[data-marker="bean"] .bingo-input--marked::after{
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><defs><radialGradient id='g' cx='.4' cy='.35' r='.7'><stop offset='0' stop-color='%23a5603a'/><stop offset='1' stop-color='%234a1d0c'/></radialGradient></defs><g transform='rotate(-20 12 12)'><path fill='url(%23g)' d='M2 12.5C2 7.5 6.5 4.5 12 4.5s10 3 10 7.5-3.6 7-7.5 7c-1.7 0-2.3-1-3.7-1s-2.3 1-4 1C4.3 19 2 16.5 2 12.5Z'/><path d='M9.4 16.5c1.1-.5 3.3-.5 4.5 0' fill='none' stroke='%23f2e3c6' stroke-width='1.1' stroke-linecap='round'/><ellipse cx='9' cy='8.6' rx='3.2' ry='1.3' fill='%23fff' fill-opacity='.3'/></g></svg>") center / contain no-repeat;
+  mask: none;
+  mix-blend-mode: normal;
+  filter: drop-shadow(0 2px 1px rgb(0 0 0 / 0.35));
+}
+
+/* Thematic: a Super Star by default, then one marker per theme */
+[data-marker="theme"]{
+  --marker-color: var(--card-bg);
+  --marker-shape: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill-rule='evenodd' d='M11.525 2.295a.53.53 0 0 1 .95 0l2.31 4.679a2.123 2.123 0 0 0 1.595 1.16l5.166.756a.53.53 0 0 1 .294.904l-3.736 3.638a2.123 2.123 0 0 0-.611 1.878l.882 5.14a.53.53 0 0 1-.771.56l-4.618-2.428a2.122 2.122 0 0 0-1.973 0L6.396 21.01a.53.53 0 0 1-.77-.56l.881-5.139a2.122 2.122 0 0 0-.611-1.879L2.16 9.795a.53.53 0 0 1 .294-.906l5.165-.755a2.122 2.122 0 0 0 1.597-1.16zM10.6 9.3a.7 1.6 0 1 0 0 3.2a.7 1.6 0 1 0 0-3.2zM13.4 9.3a.7 1.6 0 1 0 0 3.2a.7 1.6 0 1 0 0-3.2z'/></svg>");
+}
+
+/* The cross button */
+:root[data-theme="playstation"] [data-marker="theme"]{
+  --marker-shape: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M5 5l14 14M19 5 5 19' stroke='%23000' stroke-width='3.2' stroke-linecap='round'/></svg>");
+}
+
+/* The A button */
+:root[data-theme="xbox"] [data-marker="theme"]{
+  --marker-shape: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path fill-rule='evenodd' d='M12 2a10 10 0 1 1 0 20a10 10 0 1 1 0-20zM8.2 17 11 7h2l2.8 10h-2.1l-.7-2.6h-2l-.7 2.6zM11.4 12.6h1.2L12 9.9z'/></svg>");
+}
+
+:root[data-theme="game-awards"] [data-marker="theme"]{
+  --marker-color: #9c7414;
+  --marker-shape: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M7 3h10v6a5 5 0 0 1-10 0zM11 13.5h2V18h-2zM8 18h8v3H8z'/><path d='M7 5H4.5a2.5 3 0 0 0 2.8 5M17 5h2.5a2.5 3 0 0 1-2.8 5' fill='none' stroke='%23000' stroke-width='1.6' stroke-linecap='round'/></svg>");
+}
+
+/* A rainbow lightning bolt */
+:root[data-theme="rgb"] [data-marker="theme"]{
+  --marker-paint: linear-gradient(135deg, var(--rgb-colors));
+  --marker-blend: normal;
+  --marker-shape: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><path d='M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z'/></svg>");
+}
+
+/* 当 ("hit", as in 当たり) as a neon tube sign. An SVG rather than text,
+   so the glyph is centered on its em box whatever the font metrics */
+:root[data-theme="neo-tokyo"] [data-marker="theme"] .bingo-input--marked::after{
+  background: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><defs><filter id='g' x='-50%' y='-50%' width='200%' height='200%'><feGaussianBlur stdDeviation='1.2'/></filter></defs><g text-anchor='middle' dominant-baseline='central' font-family='Hiragino Sans,Yu Gothic,Noto Sans CJK JP,sans-serif' font-size='20' font-weight='700' fill='none'><text x='12' y='12' stroke='%2305d9e8' stroke-width='1.6' filter='url(%23g)'>%E5%BD%93</text><text x='12' y='12' stroke='%23fff' stroke-width='.6'>%E5%BD%93</text></g></svg>") center / contain no-repeat;
+  mask: none;
+  mix-blend-mode: normal;
+}
+
+/* The power button */
+:root[data-theme="white-build"] [data-marker="theme"]{
+  --marker-color: #1f7fd1;
+  --marker-shape: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'><g fill='none' stroke='%23000' stroke-width='2.6' stroke-linecap='round'><path d='M12 3v8'/><path d='M6.3 6.8a8 8 0 1 0 11.4 0'/></g></svg>");
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  [data-marker] .bingo-input--marked::after{
+    animation: marker-drop 0.2s ease-out;
+  }
 }
 
 /* Theme extras: effects that go beyond swapping colors */

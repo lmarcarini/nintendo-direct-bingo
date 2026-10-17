@@ -1,4 +1,5 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { MARKERS } from "./markers";
 import { THEMES } from "./themes";
 import { adjustFontSize } from "./utils/adjustFontSize";
 import {
@@ -269,7 +270,10 @@ function App({ initialCard }: { initialCard: Card }) {
           className="bingo-title"
           spellCheck="false"
         ></h1>
-        <div className={`bingo-wrapper bingo-wrapper--${card.nItems}-items`}>
+        <div
+          className={`bingo-wrapper bingo-wrapper--${card.nItems}-items`}
+          data-marker={card.marker === "none" ? undefined : card.marker}
+        >
           {Array.from({ length: card.nItems }, (_, index) => {
             const marked = isMarked(card.marks, index);
             return (
@@ -412,6 +416,31 @@ function App({ initialCard }: { initialCard: Card }) {
                     <span></span>
                   </span>
                   {theme.label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset className="options-group">
+            <legend>Marker</legend>
+            <div className="marker-picker">
+              {MARKERS.map((marker) => (
+                <label key={marker.id} className="option-choice marker-chip">
+                  <input
+                    type="radio"
+                    name="marker"
+                    className="option-radio"
+                    checked={card.marker === marker.id}
+                    onChange={() => update({ marker: marker.id })}
+                  />
+                  {/* A marked square drawn with this marker */}
+                  <span
+                    data-marker={marker.id === "none" ? undefined : marker.id}
+                    className="marker-preview"
+                    aria-hidden="true"
+                  >
+                    <span className="bingo-input--marked"></span>
+                  </span>
+                  {marker.label}
                 </label>
               ))}
             </div>

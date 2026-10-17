@@ -24,6 +24,7 @@ React 19, TypeScript (strict), Vite 8 with `@vitejs/plugin-react`, ESLint 10 fla
 - `src/main.tsx`: awaits `readCard` (decompression is async), then renders `App` with the decoded card.
 - `src/App.tsx`: the whole app (title, squares, marks, buttons, options panel, celebrations).
 - `src/themes.ts`: theme ids and labels. Each id has a `[data-theme="…"]` block in `index.css` that overrides the color custom properties; `App` sets `data-theme` on `<html>`. The blocks aren't limited to `:root` so the theme picker chips can each show their own theme's colors; effects that should only apply to the page use `:root[data-theme="…"]`.
+- `src/markers.ts`: marker ids and labels (what's drawn on a marked square). Each id but `none` has a `[data-marker="…"]` block in `index.css` that sets `--marker-shape` (an SVG mask) and color for the `.bingo-input--marked::after` pseudo-element, drawn in the square's bottom-right corner; `thematic` (`theme`) has one block per theme.
 - `src/utils/cardUrl.ts`: the `Card` type and reading/writing it to the URL.
 - `src/utils/completions.ts`: which rows, columns, diagonals or full card ("bingo") a new mark just completed, given the card's celebration settings.
 - `src/utils/share.ts`: screenshot of `.bingo-card` (PNG at 2×), copying it or the link to the clipboard, and the Web Share API (the Share button only shows where `navigator.share` exists; it attaches the screenshot where `navigator.canShare` accepts files). `copyImage` takes a `Promise<Blob>` so the clipboard write starts inside the click, which Safari requires.
@@ -43,6 +44,7 @@ The URL is the only persistence (`src/utils/cardUrl.ts`). The whole card is one 
 | `v`  | `"p"` for view mode (default edit)                         |
 | `th` | theme id from `themes.ts` (default `nintendo`)             |
 | `m`  | marks bitmask, bit i = square i hit                        |
+| `mk` | marker id from `markers.ts` drawn on marked squares (default `none`) |
 | `a`  | `0` turns celebrations off (default on)                    |
 | `dg` | `1` makes diagonals count as lines (default off)           |
 | `el` | `1` celebrates every new line, not only the first (default off) |

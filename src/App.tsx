@@ -1,4 +1,11 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import {
+  LANGUAGES,
+  isLanguage,
+  messagesFor,
+  readLanguage,
+  saveLanguage,
+} from "./i18n";
 import { MARKERS } from "./markers";
 import { THEMES } from "./themes";
 import { adjustFontSize } from "./utils/adjustFontSize";
@@ -17,13 +24,6 @@ import {
   copyLink,
   share,
 } from "./utils/share";
-
-const CELEBRATION_TEXT: Record<Completion, string> = {
-  row: "Row!",
-  column: "Column!",
-  diagonal: "Diagonal!",
-  bingo: "Bingo!",
-};
 
 // Editable elements already filled with their saved text, so re-renders
 // don't reset them (React doesn't own their content, the browser does)
@@ -56,6 +56,11 @@ const ICONS = {
   undo: ["M3 12a9 9 0 1 0 3-6.7L3 8", "M3 3v5h5"],
   check: ["M20 6 9 17l-5-5"],
   alert: ["M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0", "M12 8v4", "M12 16h.01"],
+  globe: [
+    "M3 12a9 9 0 1 0 18 0a9 9 0 1 0-18 0",
+    "M3 12h18",
+    "M12 3a14 14 0 0 1 0 18a14 14 0 0 1 0-18",
+  ],
 };
 
 function Icon({ name }: { name: keyof typeof ICONS }) {
@@ -110,6 +115,9 @@ function Switch({
 
 function App({ initialCard }: { initialCard: Card }) {
   const [card, setCard] = useState(initialCard);
+  // Per person, not part of the card: links don't carry it
+  const [language, setLanguage] = useState(readLanguage);
+  const t = messagesFor(language);
   const bingoRefs = useRef<(HTMLDivElement | null)[]>([]);
   const cardRef = useRef<HTMLDivElement>(null);
   // Short message after a share action; a new object restarts its timer
@@ -134,6 +142,10 @@ function App({ initialCard }: { initialCard: Card }) {
   useLayoutEffect(() => {
     document.documentElement.dataset.theme = card.theme;
   }, [card.theme]);
+
+  useLayoutEffect(() => {
+    document.documentElement.lang = language;
+  }, [language]);
 
   useEffect(() => {
     document.title = card.title || DEFAULT_TITLE;
@@ -212,7 +224,7 @@ function App({ initialCard }: { initialCard: Card }) {
     // The URL is the only copy of the card, so there is no undo
     if (
       (card.values.some(Boolean) || card.marks) &&
-      !window.confirm("Clear every square on the card?")
+      !window.confirm(t.confirmClear)
     )
       return;
     bingoRefs.current.forEach((ref) => {
@@ -225,7 +237,7 @@ function App({ initialCard }: { initialCard: Card }) {
   };
 
   const onClearMarks = () => {
-    if (window.confirm("Unmark every square?")) update({ marks: 0 });
+    if (window.confirm(t.confirmClearMarks)) update({ marks: 0 });
   };
 
   const notify = async (action: Promise<void>, done: string, failed: string) => {
@@ -243,18 +255,18 @@ function App({ initialCard }: { initialCard: Card }) {
   const onCopyImage = () =>
     notify(
       copyImage(cardImage(cardRef.current!)),
-      "Image copied",
-      "Couldn't copy the image"
+      t.imageCopied,
+      t.imageCopyFailed
     );
 
   const onCopyLink = () =>
-    notify(copyLink(), "Link copied", "Couldn't copy the link");
+    notify(copyLink(), t.linkCopied, t.linkCopyFailed);
 
   const onShare = () =>
     notify(
       share(card.title || DEFAULT_TITLE, cardImage(cardRef.current!)),
-      "Shared",
-      "Couldn't share the card"
+      t.shared,
+      t.shareFailed
     );
 
   return (
@@ -266,7 +278,7 @@ function App({ initialCard }: { initialCard: Card }) {
           onInput={onTitleInput}
           onBlur={onTitleBlur}
           onKeyDown={onTitleKeyDown}
-          aria-label={isEditing ? "Card title" : undefined}
+          aria-label={isEditing ? t.cardTitle : undefined}
           className="bingo-title"
           spellCheck="false"
         ></h1>
@@ -296,7 +308,7 @@ function App({ initialCard }: { initialCard: Card }) {
                 aria-pressed={isEditing ? undefined : marked}
                 aria-label={
                   isEditing || !card.values[index]
-                    ? `Square ${index + 1}`
+                    ? t.square(index + 1)
                     : undefined
                 }
                 className={`bingo-input${marked ? " bingo-input--marked" : ""}`}
@@ -314,7 +326,7 @@ function App({ initialCard }: { initialCard: Card }) {
             className="button button-secondary"
           >
             <Icon name="image" />
-            Copy image
+            {t.copyImage}
           </button>
           <button
             type="button"
@@ -322,7 +334,7 @@ function App({ initialCard }: { initialCard: Card }) {
             className="button button-secondary"
           >
             <Icon name="link" />
-            Copy link
+            {t.copyLink}
           </button>
           {canShare && (
             <button
@@ -331,7 +343,7 @@ function App({ initialCard }: { initialCard: Card }) {
               className="button button-secondary"
             >
               <Icon name="share" />
-              Share
+              {t.share}
             </button>
           )}
           <span role="status" className="share-notice">
@@ -351,7 +363,7 @@ function App({ initialCard }: { initialCard: Card }) {
               className="button button-secondary"
             >
               <Icon name="undo" />
-              Clear marks
+              {t.clearMarks}
             </button>
           )}
           <button
@@ -360,7 +372,7 @@ function App({ initialCard }: { initialCard: Card }) {
             className="button button-primary"
           >
             <Icon name={isEditing ? "eye" : "pencil"} />
-            {isEditing ? "View" : "Edit"}
+            {isEditing ? t.view : t.edit}
           </button>
           {isEditing && (
             <button
@@ -369,16 +381,16 @@ function App({ initialCard }: { initialCard: Card }) {
               className="button button-secondary"
             >
               <Icon name="trash" />
-              Clear
+              {t.clear}
             </button>
           )}
         </div>
       </div>
       <details className="options" hidden={!isEditing}>
-        <summary className="options-summary">Card options</summary>
+        <summary className="options-summary">{t.cardOptions}</summary>
         <div className="options-body">
           <fieldset className="options-group">
-            <legend>Squares</legend>
+            <legend>{t.squares}</legend>
             <div className="segmented">
               {([16, 25] as const).map((n) => (
                 <label key={n} className="option-choice">
@@ -395,7 +407,7 @@ function App({ initialCard }: { initialCard: Card }) {
             </div>
           </fieldset>
           <fieldset className="options-group">
-            <legend>Theme</legend>
+            <legend>{t.theme}</legend>
             <div className="theme-picker">
               {THEMES.map((theme) => (
                 // data-theme gives the chip that theme's colors
@@ -421,48 +433,48 @@ function App({ initialCard }: { initialCard: Card }) {
             </div>
           </fieldset>
           <fieldset className="options-group">
-            <legend>Marker</legend>
+            <legend>{t.marker}</legend>
             <div className="marker-picker">
               {MARKERS.map((marker) => (
-                <label key={marker.id} className="option-choice marker-chip">
+                <label key={marker} className="option-choice marker-chip">
                   <input
                     type="radio"
                     name="marker"
                     className="option-radio"
-                    checked={card.marker === marker.id}
-                    onChange={() => update({ marker: marker.id })}
+                    checked={card.marker === marker}
+                    onChange={() => update({ marker })}
                   />
                   {/* A marked square drawn with this marker */}
                   <span
-                    data-marker={marker.id === "none" ? undefined : marker.id}
+                    data-marker={marker === "none" ? undefined : marker}
                     className="marker-preview"
                     aria-hidden="true"
                   >
                     <span className="bingo-input--marked"></span>
                   </span>
-                  {marker.label}
+                  {t.markers[marker]}
                 </label>
               ))}
             </div>
           </fieldset>
           <fieldset className="options-group">
-            <legend>Celebrations</legend>
+            <legend>{t.celebrationsGroup}</legend>
             <Switch
-              label="Animations"
-              hint="Full-screen animation when you complete a line or the card"
+              label={t.animations}
+              hint={t.animationsHint}
               checked={card.animations}
               onChange={(animations) => update({ animations })}
             />
             <Switch
-              label="Diagonals"
-              hint="Diagonal lines count as lines"
+              label={t.diagonals}
+              hint={t.diagonalsHint}
               checked={card.diagonals}
               disabled={!card.animations}
               onChange={(diagonals) => update({ diagonals })}
             />
             <Switch
-              label="Every line"
-              hint="Celebrate each new line, not only the first"
+              label={t.everyLine}
+              hint={t.everyLineHint}
               checked={card.everyLine}
               disabled={!card.animations}
               onChange={(everyLine) => update({ everyLine })}
@@ -470,6 +482,27 @@ function App({ initialCard }: { initialCard: Card }) {
           </fieldset>
         </div>
       </details>
+      <label className="language-picker">
+        <Icon name="globe" />
+        <span className="visually-hidden">{t.language}</span>
+        <select
+          className="language-select"
+          value={language}
+          onChange={(e) => {
+            const value = e.currentTarget.value;
+            if (!isLanguage(value)) return;
+            setLanguage(value);
+            saveLanguage(value);
+          }}
+        >
+          {LANGUAGES.map((option) => (
+            // Each language named in itself, so it's findable from any other
+            <option key={option.id} value={option.id} lang={option.id}>
+              {option.label}
+            </option>
+          ))}
+        </select>
+      </label>
       {celebrations.length > 0 && (
         <div
           key={celebrations[0].id}
@@ -482,7 +515,7 @@ function App({ initialCard }: { initialCard: Card }) {
           }}
         >
           <span className="celebration-text">
-            {CELEBRATION_TEXT[celebrations[0].kind]}
+            {t.celebrations[celebrations[0].kind]}
           </span>
         </div>
       )}

@@ -16,7 +16,9 @@ export const writeCard = async (card: Card) => {
   const encoded = await encodeCard(card);
   if (write !== latestWrite) return;
 
+  // Other params (the room) stay
   const url = new URL(window.location.href);
-  url.search = encoded ? `?${PARAM}=${encoded}` : "";
+  if (encoded) url.searchParams.set(PARAM, encoded);
+  else url.searchParams.delete(PARAM);
   window.history.replaceState(null, "", url);
 };

@@ -1,6 +1,7 @@
 import type { Ref } from "react";
 import { isMarked, type Card } from "../../card/card";
 import type { UpdateCard } from "../../hooks/useCard";
+import type { Editing } from "../../hooks/useRoom";
 import { CardTitle } from "./CardTitle";
 import { Square } from "./Square";
 
@@ -10,11 +11,13 @@ export function BingoCard({
   card,
   update,
   onToggleMark,
+  editing,
 }: {
   ref: Ref<HTMLDivElement>;
   card: Card;
   update: UpdateCard;
   onToggleMark: (index: number) => void;
+  editing: Editing;
 }) {
   const isEditing = card.view === "edit";
 
@@ -28,7 +31,10 @@ export function BingoCard({
       <CardTitle
         title={card.title}
         isEditing={isEditing}
+        lockedBy={editing.lockedBy("title")}
         onChange={(title) => update({ title })}
+        onEditStart={() => editing.start("title")}
+        onEditEnd={() => editing.end("title")}
       />
       <div
         className={`bingo-wrapper bingo-wrapper--${card.nItems}-items`}
@@ -41,8 +47,11 @@ export function BingoCard({
             text={card.values[index]}
             marked={isMarked(card.marks, index)}
             isEditing={isEditing}
+            lockedBy={editing.lockedBy(index)}
             onChange={onSquareChange}
             onToggleMark={onToggleMark}
+            onEditStart={editing.start}
+            onEditEnd={editing.end}
           />
         ))}
       </div>

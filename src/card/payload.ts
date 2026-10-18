@@ -1,4 +1,11 @@
-import { DEFAULT_CARD, MAX_SQUARES, type Card } from "./card";
+import {
+  clampText,
+  DEFAULT_CARD,
+  MAX_SQUARE_LENGTH,
+  MAX_SQUARES,
+  MAX_TITLE_LENGTH,
+  type Card,
+} from "./card";
 import { isMarker } from "./markers";
 import { isTheme } from "./themes";
 
@@ -33,8 +40,9 @@ export const toPayload = (card: Card): Payload => {
   return payload;
 };
 
-// Payloads come from links (and later from other players), so every field
-// is checked and anything invalid falls back to its default
+// Payloads come from links and from the room server, so every field is
+// checked: anything invalid falls back to its default, and text over the
+// limits is cut
 export const fromPayload = (data: unknown): Card => {
   const payload: Payload =
     typeof data === "object" && data !== null ? (data as Payload) : {};
@@ -42,10 +50,12 @@ export const fromPayload = (data: unknown): Card => {
   return {
     title:
       typeof payload.t === "string" && payload.t
-        ? payload.t
+        ? clampText(payload.t, MAX_TITLE_LENGTH)
         : DEFAULT_CARD.title,
     values: Array.from({ length: MAX_SQUARES }, (_, i) =>
-      typeof squares[i] === "string" ? squares[i] : ""
+      typeof squares[i] === "string"
+        ? clampText(squares[i], MAX_SQUARE_LENGTH)
+        : ""
     ),
     nItems: payload.n === 25 ? 25 : DEFAULT_CARD.nItems,
     view: payload.v === "p" ? "preview" : DEFAULT_CARD.view,

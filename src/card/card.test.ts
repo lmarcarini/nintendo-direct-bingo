@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { isMarked, toggleMark } from "./card";
+import { clampText, isMarked, toggleMark } from "./card";
 
 describe("marks", () => {
   it("toggles a square on and off", () => {
@@ -14,5 +14,16 @@ describe("marks", () => {
     expect(isMarked(marks, 0)).toBe(true);
     expect(isMarked(marks, 24)).toBe(true);
     expect(isMarked(toggleMark(marks, 0), 24)).toBe(true);
+  });
+});
+
+describe("clampText", () => {
+  it("leaves short text alone and cuts long text", () => {
+    expect(clampText("abc", 3)).toBe("abc");
+    expect(clampText("abcd", 3)).toBe("abc");
+  });
+
+  it("never splits an emoji's surrogate pair", () => {
+    expect(clampText("😀😀😀", 2)).toBe("😀😀");
   });
 });

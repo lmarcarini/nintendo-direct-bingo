@@ -44,4 +44,28 @@ export const ptBR: Messages = {
   everyLine: "Toda linha",
   everyLineHint: "Comemorar cada nova linha, não só a primeira",
   language: "Idioma",
+  playTogether: "Jogar junto",
+  roomName: "Nome da sala",
+  roomNameHint:
+    "Letras, números e hífens. Quem souber o nome pode entrar, então escolha um difícil de adivinhar.",
+  playerName: "Seu nome",
+  joinRoom: "Entrar na sala",
+  joinHint:
+    "Uma sala nova começa com esta cartela. Entrar numa que já existe traz a cartela dela.",
+  confirmJoin:
+    "Se esta sala já existir, a cartela dela substitui a sua (copie seu link antes para guardá-la). Entrar?",
+  leaveRoom: "Sair da sala",
+  connecting: "Conectando… O servidor pode levar até um minuto para acordar.",
+  reconnecting: "Conexão perdida, reconectando… A cartela continua funcionando aqui.",
+  inRoom: (room: string) => `Na sala ${room}`,
+  players: "Jogadores",
+  you: "você",
+  editing: (name: string) => `${name} está editando`,
+  roomErrors: {
+    "room-full": "Essa sala está cheia.",
+    "rooms-full": "O servidor está sem salas livres agora. Tente mais tarde.",
+    invalid: "Confira o nome da sala e o seu nome.",
+    outdated: "O app foi atualizado. Recarregue a página para entrar.",
+    unavailable: "Não foi possível carregar as salas. Confira sua conexão e tente de novo.",
+  },
 };

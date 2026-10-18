@@ -1,5 +1,6 @@
 import type { Completion } from "../card/completions";
 import type { Marker } from "../card/markers";
+import type { RoomState } from "../room/session";
 import type { en } from "./en";
 
 // Every language has English's shape, with the keyed groups spelled out so
@@ -7,4 +8,5 @@ import type { en } from "./en";
 export type Messages = typeof en & {
   celebrations: Record<Completion, string>;
   markers: Record<Marker, string>;
+  roomErrors: Record<NonNullable<RoomState["error"]>, string>;
 };

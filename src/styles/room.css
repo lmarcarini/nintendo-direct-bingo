@@ -1,0 +1,126 @@
+/* The room panel reuses the options panel's look (.options) */
+
+.room-summary{
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+}
+
+/* Connection status at a glance, while the panel is closed */
+.room-dot{
+  width: 0.55em;
+  height: 0.55em;
+  border-radius: 50%;
+  background-color: #2ecc71;
+}
+
+.room-dot--connecting,
+.room-dot--reconnecting{
+  background-color: #f1c40f;
+  animation: room-pulse 1.2s ease-in-out infinite;
+}
+
+@keyframes room-pulse {
+  50% { opacity: 0.3; }
+}
+
+.room-form,
+.room-status{
+  display: grid;
+  gap: 0.9rem;
+}
+
+.room-form p,
+.room-status p{
+  margin: 0;
+}
+
+.room-field{
+  display: grid;
+  gap: 0.3rem;
+}
+
+.room-label{
+  font-size: 0.75rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+.room-input{
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 22rem;
+  padding: 0.5rem 0.7rem;
+  border: 2px solid var(--options-line);
+  border-radius: 8px;
+  background-color: var(--page-bg);
+  color: var(--page-text);
+  font: inherit;
+}
+
+.room-input:focus-visible{
+  outline: 2px dashed var(--options-ring);
+  outline-offset: 2px;
+}
+
+.room-hint{
+  font-size: 0.8rem;
+  opacity: 0.75;
+}
+
+.room-error{
+  font-weight: 600;
+}
+
+.room-players{
+  margin: 0;
+  padding-inline-start: 1.2rem;
+}
+
+.room-you{
+  opacity: 0.7;
+}
+
+/* A square or the title someone else is editing: their name on top. Inside
+   the square, which clips its overflow; above the title */
+.bingo-input[data-editor],
+.bingo-title[data-editor]{
+  cursor: not-allowed;
+  outline: 2px dashed var(--title-shadow);
+  outline-offset: 2px;
+}
+
+.bingo-input[data-editor]::before,
+.bingo-title[data-editor]::before{
+  content: attr(data-editor);
+  position: absolute;
+  top: 3px;
+  left: 50%;
+  translate: -50% 0;
+  z-index: 1;
+  max-width: 100%;
+  overflow: hidden;
+  padding: 0 0.4em;
+  border-radius: 999px;
+  background-color: var(--title-shadow);
+  color: var(--title-text);
+  font-family: Inter, system-ui, sans-serif;
+  font-size: 0.6rem;
+  font-weight: 700;
+  line-height: 1.5;
+  text-overflow: ellipsis;
+  text-shadow: none;
+  white-space: nowrap;
+}
+
+.bingo-title[data-editor]{
+  position: relative;
+}
+
+.bingo-title[data-editor]::before{
+  top: 0;
+  translate: -50% -110%;
+  font-size: 0.75rem;
+}

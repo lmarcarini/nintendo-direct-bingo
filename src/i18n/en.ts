@@ -44,4 +44,28 @@ export const en = {
   everyLine: "Every line",
   everyLineHint: "Celebrate each new line, not only the first",
   language: "Language",
+  playTogether: "Play together",
+  roomName: "Room name",
+  roomNameHint:
+    "Letters, numbers and dashes. Anyone with the name can join, so pick one that's hard to guess.",
+  playerName: "Your name",
+  joinRoom: "Join room",
+  joinHint:
+    "A new room starts with this card. Joining one that exists gets its card instead.",
+  confirmJoin:
+    "If this room already exists, its card replaces yours (copy your link first to keep it). Join?",
+  leaveRoom: "Leave room",
+  connecting: "Connecting… The server can take up to a minute to wake up.",
+  reconnecting: "Connection lost, reconnecting… The card still works here.",
+  inRoom: (room: string) => `In room ${room}`,
+  players: "Players",
+  you: "you",
+  editing: (name: string) => `${name} is editing`,
+  roomErrors: {
+    "room-full": "That room is full.",
+    "rooms-full": "The server has no free rooms right now. Try again later.",
+    invalid: "Check the room name and your name.",
+    outdated: "The app has been updated. Reload the page to join.",
+    unavailable: "Couldn't load rooms. Check your connection and try again.",
+  },
 };

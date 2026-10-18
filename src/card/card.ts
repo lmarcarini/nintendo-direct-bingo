@@ -4,6 +4,9 @@ import { DEFAULT_THEME, type Theme } from "./themes";
 export const MAX_SQUARES = 25;
 export const SQUARE_COUNTS = [16, 25] as const;
 export const DEFAULT_TITLE = "Nintendo Direct Bingo";
+// The room server's limits (its protocol.ts), in code points
+export const MAX_TITLE_LENGTH = 80;
+export const MAX_SQUARE_LENGTH = 150;
 
 export type View = "edit" | "preview";
 export type SquareCount = (typeof SQUARE_COUNTS)[number];
@@ -32,6 +35,12 @@ export const DEFAULT_CARD: Card = {
   animations: true,
   diagonals: false,
   everyLine: false,
+};
+
+// Cuts text to `max` code points, so an emoji is never split in half
+export const clampText = (text: string, max: number) => {
+  const chars = [...text];
+  return chars.length > max ? chars.slice(0, max).join("") : text;
 };
 
 export const isMarked = (marks: number, index: number) =>

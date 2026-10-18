@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vitest";
-import { DEFAULT_CARD, MAX_SQUARES, type Card } from "./card";
+import {
+  DEFAULT_CARD,
+  MAX_SQUARE_LENGTH,
+  MAX_SQUARES,
+  MAX_TITLE_LENGTH,
+  type Card,
+} from "./card";
 import { fromPayload, toPayload } from "./payload";
 
 const squares = (...text: string[]) => [
@@ -90,6 +96,12 @@ describe("fromPayload", () => {
     });
     expect(values).toHaveLength(MAX_SQUARES);
     expect(values.slice(0, 5)).toEqual(["a", "", "", "", "z"]);
+  });
+
+  it("cuts text over the limits, by code point", () => {
+    const card = fromPayload({ t: "😀".repeat(100), s: ["a".repeat(200)] });
+    expect(card.title).toBe("😀".repeat(MAX_TITLE_LENGTH));
+    expect(card.values[0]).toHaveLength(MAX_SQUARE_LENGTH);
   });
 
   it("keeps marks within the card's squares", () => {

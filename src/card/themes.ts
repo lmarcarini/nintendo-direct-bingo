@@ -1,5 +1,5 @@
-// The default theme is the plain `:root` block in index.css; each other id
-// has a matching `:root[data-theme="…"]` block that overrides its colors
+// Colors live in styles/themes.css: the default theme is the `:root` block,
+// and each other id has a `[data-theme="…"]` block that overrides them
 export const THEMES = [
   { id: "nintendo", label: "Nintendo" },
   { id: "playstation", label: "PlayStation" },

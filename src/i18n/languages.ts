@@ -1,12 +1,6 @@
-import type { Marker } from "../markers";
-import type { Completion } from "../utils/completions";
 import { en } from "./en";
+import type { Messages } from "./messages";
 import { ptBR } from "./pt-BR";
-
-export type Messages = typeof en & {
-  celebrations: Record<Completion, string>;
-  markers: Record<Marker, string>;
-};
 
 // To add a language: write a `Messages` file next to this one and list it
 // here. `id` is a BCP 47 tag (also set as <html lang>), `label` is the
@@ -61,47 +55,8 @@ export type Language = (typeof LANGUAGES)[number]["id"];
 
 export const DEFAULT_LANGUAGE: Language = "en";
 
-const STORAGE_KEY = "language";
-
 export const isLanguage = (value: unknown): value is Language =>
   LANGUAGES.some((language) => language.id === value);
 
 export const messagesFor = (id: Language): Messages =>
   LANGUAGES.find((language) => language.id === id)!.messages;
-
-// Location first (the time zone), then the browser's preferred languages
-const detectLanguage = (): Language => {
-  const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
-  const local = LANGUAGES.find((language) =>
-    (language.timeZones as readonly string[]).includes(timeZone)
-  );
-  if (local) return local.id;
-
-  for (const tag of navigator.languages) {
-    const primary = tag.split("-")[0].toLowerCase();
-    const match = LANGUAGES.find((language) =>
-      (language.browserLanguages as readonly string[]).includes(primary)
-    );
-    if (match) return match.id;
-  }
-  return DEFAULT_LANGUAGE;
-};
-
-// Storage can be unavailable (private windows, blocked site data)
-export const readLanguage = (): Language => {
-  try {
-    const saved = localStorage.getItem(STORAGE_KEY);
-    if (isLanguage(saved)) return saved;
-  } catch {
-    // Fall through to detection
-  }
-  return detectLanguage();
-};
-
-export const saveLanguage = (language: Language) => {
-  try {
-    localStorage.setItem(STORAGE_KEY, language);
-  } catch {
-    // Not saved; the choice still applies until the page is closed
-  }
-};

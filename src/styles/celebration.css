@@ -1,0 +1,192 @@
+/* Full-screen celebration when a mark completes a row, a column or the
+   card. The base look is built from the theme colors: the card color with
+   spinning rays behind the title text */
+
+@keyframes celebration-fade {
+  0% { opacity: 0; }
+  10%, 85% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+@keyframes celebration-pop {
+  0% { transform: scale(0.2) rotate(-8deg); opacity: 0; }
+  15% { transform: scale(1.1) rotate(2deg); opacity: 1; }
+  22%, 85% { transform: scale(1) rotate(0); }
+  100% { transform: scale(1.25); }
+}
+
+@keyframes celebration-rings {
+  from { transform: scale(0.6); }
+  to { transform: scale(1.6); }
+}
+
+@keyframes celebration-sweep {
+  from { transform: translateX(-100%); }
+  to { transform: translateX(100%); }
+}
+
+@keyframes neon-on {
+  0%, 6%, 10%, 14% { opacity: 0; }
+  4%, 8%, 12%, 16%, 85% { opacity: 1; }
+  100% { opacity: 0; }
+}
+
+.celebration {
+  --celebration-duration: 1.5s;
+  --celebration-rays: rgb(255 255 255 / 0.14);
+  position: fixed;
+  inset: 0;
+  z-index: 10;
+  display: grid;
+  place-items: center;
+  overflow: hidden;
+  pointer-events: none;
+  background-color: var(--card-bg);
+  animation: celebration-fade var(--celebration-duration) ease-out forwards;
+}
+
+.celebration--bingo {
+  --celebration-duration: 2.6s;
+  --celebration-rays: color-mix(in srgb, var(--mark-bg) 55%, transparent);
+}
+
+.celebration::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: repeating-conic-gradient(
+    from var(--spin-angle),
+    var(--celebration-rays) 0 9deg,
+    transparent 9deg 18deg
+  );
+}
+
+.celebration-text {
+  position: relative;
+  padding-inline: 0.2em;
+  font-family: Gilroy, sans-serif;
+  font-size: clamp(3.5rem, 16vw, 9rem);
+  line-height: 1.1;
+  color: var(--title-text);
+  text-shadow: -0.06em 0.06em 0 var(--title-shadow);
+  animation: celebration-pop var(--celebration-duration) both;
+}
+
+.celebration--bingo .celebration-text {
+  font-size: clamp(4.5rem, 22vw, 13rem);
+}
+
+:root[data-theme="game-awards"] .celebration {
+  --celebration-rays: rgb(232 195 90 / 0.12);
+}
+
+:root[data-theme="game-awards"] .celebration--bingo {
+  --celebration-rays: rgb(232 195 90 / 0.3);
+}
+
+/* Xbox: green rings pulsing out from the middle instead of rays */
+:root[data-theme="xbox"] .celebration::before {
+  inset: -30%;
+  background: repeating-radial-gradient(
+    circle,
+    transparent 0 60px,
+    rgb(155 240 11 / 0.25) 60px 72px
+  );
+}
+
+:root[data-theme="rgb"] .celebration {
+  background-color: var(--page-bg);
+}
+
+:root[data-theme="rgb"] .celebration::before {
+  opacity: 0.35;
+  background: conic-gradient(from var(--spin-angle), var(--rgb-colors));
+}
+
+/* Neo Tokyo: a neon sign flickering on, over scanlines, with a katakana
+   subtitle that screen readers skip */
+:root[data-theme="neo-tokyo"] .celebration {
+  background-color: rgb(10 6 24 / 0.94);
+}
+
+:root[data-theme="neo-tokyo"] .celebration::before {
+  background:
+    repeating-linear-gradient(transparent 0 3px, rgb(255 42 109 / 0.07) 3px 4px),
+    radial-gradient(ellipse at center, rgb(255 42 109 / 0.25), transparent 60%);
+}
+
+:root[data-theme="neo-tokyo"] .celebration-text {
+  font-family: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
+  font-weight: 300;
+  text-shadow:
+    0 0 4px #fff,
+    0 0 12px #ff2a6d,
+    0 0 28px #ff2a6d,
+    0 0 56px #ff2a6d;
+}
+
+:root[data-theme="neo-tokyo"] .celebration-text::after {
+  display: block;
+  font-size: 0.3em;
+  letter-spacing: 0.3em;
+  color: #a8f7ff;
+  text-shadow:
+    0 0 6px #05d9e8,
+    0 0 18px #05d9e8;
+}
+
+:root[data-theme="neo-tokyo"] .celebration--row .celebration-text::after {
+  content: "ヨコ" / "";
+}
+
+:root[data-theme="neo-tokyo"] .celebration--column .celebration-text::after {
+  content: "タテ" / "";
+}
+
+:root[data-theme="neo-tokyo"] .celebration--diagonal .celebration-text::after {
+  content: "ナナメ" / "";
+}
+
+:root[data-theme="neo-tokyo"] .celebration--bingo .celebration-text::after {
+  content: "ビンゴ" / "";
+}
+
+/* White Build: a band of ice-blue light sweeping across, like a lit panel */
+:root[data-theme="white-build"] .celebration::before {
+  inset: 0 -50%;
+  background: linear-gradient(
+    100deg,
+    transparent 35%,
+    rgb(143 208 255 / 0.55) 50%,
+    transparent 65%
+  );
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .celebration::before {
+    animation: spin-angle 10s linear infinite;
+  }
+
+  :root[data-theme="xbox"] .celebration::before {
+    animation: celebration-rings 1.2s ease-out infinite;
+  }
+
+  :root[data-theme="neo-tokyo"] .celebration::before {
+    animation: none;
+  }
+
+  :root[data-theme="neo-tokyo"] .celebration-text {
+    animation: neon-on var(--celebration-duration) linear both;
+  }
+
+  :root[data-theme="white-build"] .celebration::before {
+    animation: celebration-sweep 1.2s ease-in-out infinite;
+  }
+}
+
+/* Without motion the overlay still fades in and out, but nothing moves */
+@media (prefers-reduced-motion: reduce) {
+  .celebration-text {
+    animation: none;
+  }
+}

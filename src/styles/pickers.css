@@ -1,0 +1,76 @@
+.theme-picker{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(6.5rem, 1fr));
+  gap: 0.5rem;
+}
+
+.theme-chip{
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 0.4rem;
+  padding: 0.6rem 0.4rem;
+  border-radius: 10px;
+  background-color: var(--card-bg);
+  color: var(--title-text);
+  box-shadow: 0 0 0 1px var(--options-line);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.theme-chip:has(:checked),
+.marker-chip:has(:checked){
+  box-shadow: 0 0 0 2px var(--options-gap), 0 0 0 4px var(--options-ring);
+}
+
+.theme-chip-swatch{
+  display: flex;
+  gap: 4px;
+}
+
+.theme-chip-swatch > span{
+  width: 1.1rem;
+  aspect-ratio: 1;
+  border-radius: 4px;
+  background-color: var(--square-bg);
+}
+
+.theme-chip-swatch > span + span{
+  background-color: var(--mark-bg);
+}
+
+.theme-chip[data-theme="rgb"]{
+  background:
+    linear-gradient(var(--card-bg), var(--card-bg)) padding-box,
+    conic-gradient(var(--rgb-colors)) border-box;
+  border: 2px solid transparent;
+}
+
+.marker-picker{
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(5.5rem, 1fr));
+  gap: 0.5rem;
+}
+
+.marker-chip{
+  display: grid;
+  justify-items: center;
+  align-content: start;
+  gap: 0.4rem;
+  padding: 0.6rem 0.4rem;
+  border-radius: 10px;
+  box-shadow: 0 0 0 1px var(--options-line);
+  font-size: 0.8rem;
+  font-weight: 600;
+  line-height: 1.2;
+  text-align: center;
+}
+
+.marker-preview > span{
+  display: block;
+  width: 2.5rem;
+  aspect-ratio: 1;
+  border-radius: 5px;
+}

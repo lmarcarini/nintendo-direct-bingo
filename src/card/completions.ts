@@ -1,4 +1,4 @@
-import { isMarked } from "./cardUrl";
+import { isMarked } from "./card";
 
 export type Completion = "row" | "column" | "diagonal" | "bingo";
 

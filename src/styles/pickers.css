@@ -74,3 +74,93 @@
   aspect-ratio: 1;
   border-radius: 5px;
 }
+
+.theme-chip--all{
+  align-content: center;
+  border: none;
+  background: none;
+  color: inherit;
+  font: inherit;
+  font-size: 0.8rem;
+  font-weight: 600;
+  box-shadow: 0 0 0 1px var(--options-line);
+}
+
+.theme-chip--all:focus-visible{
+  outline: 2px dashed var(--options-ring);
+  outline-offset: 2px;
+}
+
+.theme-chip--all .icon{
+  width: 1.4rem;
+  height: 1.4rem;
+}
+
+/* All themes, full screen over the page */
+.theme-dialog{
+  box-sizing: border-box;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  max-height: none;
+  margin: 0;
+  padding: 0 clamp(1rem, 4vw, 2rem) clamp(1rem, 4vw, 2rem);
+  border: none;
+  background-color: var(--page-bg);
+  color: var(--page-text);
+}
+
+html:has(.theme-dialog[open]){
+  overflow: hidden;
+}
+
+.theme-dialog-header{
+  position: sticky;
+  top: 0;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  max-width: 60rem;
+  margin-inline: auto;
+  padding-block: 1rem;
+  background-color: var(--page-bg);
+}
+
+.theme-dialog-header h2{
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.theme-dialog-close{
+  display: grid;
+  place-items: center;
+  padding: 0.5rem;
+  border: none;
+  border-radius: 999px;
+  background-color: var(--options-line);
+  color: inherit;
+  cursor: pointer;
+}
+
+.theme-dialog-close:focus-visible{
+  outline: 2px dashed var(--options-ring);
+  outline-offset: 2px;
+}
+
+.theme-picker--all{
+  grid-template-columns: repeat(auto-fill, minmax(9rem, 1fr));
+  gap: 0.75rem;
+  max-width: 60rem;
+  margin-inline: auto;
+  padding: 4px;
+}
+
+.theme-picker--all .theme-chip{
+  padding: 1rem 0.5rem;
+  font-size: 0.9rem;
+}
+
+.theme-picker--all .theme-chip-swatch > span{
+  width: 1.6rem;
+}

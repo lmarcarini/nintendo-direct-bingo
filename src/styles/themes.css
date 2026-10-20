@@ -10,10 +10,16 @@
   --title-shadow: #9e000d;
   --square-bg: #fff;
   --square-text: #213547;
-  --mark-bg: #ffd400;
+  --mark-bg: #8ad8ff;
   --mark-text: #213547;
   /* Checkmark and thumbs up markers */
   --marker-color: var(--title-shadow);
+}
+
+/* Gold markers, drawn over the light blue rather than multiplied with it */
+[data-theme="nintendo"] {
+  --marker-color: #f2b400;
+  --marker-blend: normal;
 }
 
 :root {
@@ -98,4 +104,108 @@
   --mark-text: #0d1b2a;
   --marker-color: #1f7fd1;
   color-scheme: light;
+}
+
+/* Kawaii neon: hot pink, pastel squares and mint marks */
+[data-theme="neko-neon"] {
+  --page-bg: #24092b;
+  --page-text: #ffe3f3;
+  --card-bg: #ff4fae;
+  --title-text: #fff;
+  --title-shadow: #b0126f;
+  --square-bg: #fff2f9;
+  --square-text: #6d0d48;
+  --mark-bg: #9ff5d8;
+  --mark-text: #4a0832;
+  --marker-color: #ff2e93;
+}
+
+/* The original Game Boy's four greens */
+[data-theme="retro"] {
+  --page-bg: #0f380f;
+  --page-text: #9bbc0f;
+  --card-bg: #306230;
+  --title-text: #9bbc0f;
+  --title-shadow: #0f380f;
+  --square-bg: #9bbc0f;
+  --square-text: #0f380f;
+  --mark-bg: #8bac0f;
+  --mark-text: #0f380f;
+  --marker-color: #0f380f;
+}
+
+/* Red, black and white, like a calling card */
+[data-theme="persona"] {
+  --page-bg: #0b0b0b;
+  --card-bg: #e5191c;
+  --title-text: #fff;
+  --title-shadow: #000;
+  --square-bg: #fff;
+  --square-text: #0b0b0b;
+  --mark-bg: #0b0b0b;
+  --mark-text: #fff;
+}
+
+/* Forest green, parchment and Triforce gold */
+[data-theme="zelda"] {
+  --page-bg: #0b1d13;
+  --page-text: #f3e9c6;
+  --card-bg: #1d4d32;
+  --title-text: #f5c94a;
+  --title-shadow: #5a3d00;
+  --square-bg: #f3e9c6;
+  --square-text: #3b2a12;
+  --mark-bg: #2f7d4a;
+  --mark-text: #fff8dc;
+}
+
+/* The NES palette's blues */
+[data-theme="mega-man"] {
+  --page-bg: #000c2e;
+  --card-bg: #0058f8;
+  --title-shadow: #00288c;
+  --square-bg: #fcfcfc;
+  --square-text: #000c2e;
+  --mark-bg: #3cbcfc;
+  --mark-text: #000c2e;
+}
+
+/* Purple turf, lime and orange ink */
+[data-theme="splatoon"] {
+  --page-bg: #141018;
+  --card-bg: #6b2ce0;
+  --title-text: #c6ff00;
+  --title-shadow: #2a0c66;
+  --square-bg: #fff;
+  --square-text: #1b0a3a;
+  --mark-bg: #c6ff00;
+  --mark-text: #1b0a3a;
+}
+
+/* Leaf green, cream and bells */
+[data-theme="animal-crossing"] {
+  --page-bg: #f6efd3;
+  --page-text: #5b4128;
+  --card-bg: #78c850;
+  --title-text: #fff;
+  --title-shadow: #3f7f24;
+  --square-bg: #fffbe8;
+  --square-text: #5b4128;
+  --mark-bg: #ffd45e;
+  --mark-text: #5b4128;
+  color-scheme: light;
+}
+
+/* Store page blues */
+[data-theme="steam"] {
+  --page-bg: #171a21;
+  --page-text: #c7d5e0;
+  --card-bg: #1b2838;
+  --title-text: #fff;
+  --title-shadow: #0e1620;
+  --square-bg: #2a475e;
+  --square-text: #c7d5e0;
+  --mark-bg: #66c0f4;
+  --mark-text: #0e1a24;
+  --marker-color: #1b2838;
 }

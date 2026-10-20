@@ -27,6 +27,9 @@ export const ptBR: Messages = {
   cardOptions: "Opções da cartela",
   squares: "Quadrados",
   theme: "Tema",
+  themes: "Temas",
+  allThemes: (n: number) => `Todos os temas (${n})`,
+  close: "Fechar",
   marker: "Marcador",
   markers: {
     none: "Nenhum",

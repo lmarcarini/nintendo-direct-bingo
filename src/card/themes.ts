@@ -8,6 +8,14 @@ export const THEMES = [
   { id: "rgb", label: "RGB Battlestation" },
   { id: "neo-tokyo", label: "Neo Tokyo Arcade" },
   { id: "white-build", label: "White Build" },
+  { id: "neko-neon", label: "Neko Neon" },
+  { id: "retro", label: "Retro Pixel" },
+  { id: "persona", label: "Persona" },
+  { id: "zelda", label: "Zelda" },
+  { id: "mega-man", label: "Mega Man" },
+  { id: "splatoon", label: "Splatoon" },
+  { id: "animal-crossing", label: "Animal Crossing" },
+  { id: "steam", label: "Steam" },
 ] as const;
 
 export type Theme = (typeof THEMES)[number]["id"];

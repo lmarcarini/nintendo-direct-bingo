@@ -27,6 +27,9 @@ export const en = {
   cardOptions: "Card options",
   squares: "Squares",
   theme: "Theme",
+  themes: "Themes",
+  allThemes: (n: number) => `All themes (${n})`,
+  close: "Close",
   marker: "Marker",
   markers: {
     none: "None",

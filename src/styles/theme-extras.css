@@ -150,3 +150,200 @@
     animation: neon-flicker 6s linear infinite;
   }
 }
+
+/* Neko Neon: pink polka dots and a glowing card */
+:root[data-theme="neko-neon"] {
+  background-image: radial-gradient(rgb(255 79 174 / 0.18) 2px, transparent 2.5px);
+  background-size: 22px 22px;
+}
+
+:root[data-theme="neko-neon"] .bingo-card {
+  border-radius: 28px;
+  box-shadow:
+    0 0 0 3px #ffd1ea,
+    0 0 18px #ff4fae,
+    0 0 48px rgb(255 79 174 / 0.55);
+}
+
+:root[data-theme="neko-neon"] .bingo-input {
+  border-radius: 12px;
+}
+
+:root[data-theme="neko-neon"] .bingo-input--marked {
+  box-shadow:
+    inset 0 0 0 3px #fff,
+    0 0 12px #9ff5d8;
+}
+
+/* Retro Pixel: square corners, stepped borders and a monospace font */
+:root[data-theme="retro"] .bingo-card,
+:root[data-theme="retro"] .bingo-input,
+:root[data-theme="retro"] .button {
+  border-radius: 0;
+}
+
+:root[data-theme="retro"] .bingo-card {
+  box-shadow:
+    0 -6px 0 #8bac0f,
+    0 6px 0 #8bac0f,
+    -6px 0 0 #8bac0f,
+    6px 0 0 #8bac0f;
+}
+
+:root[data-theme="retro"] .bingo-input {
+  font-family: ui-monospace, "Cascadia Mono", Menlo, Consolas, monospace;
+  text-transform: uppercase;
+  box-shadow: inset -3px -3px 0 #8bac0f;
+}
+
+:root[data-theme="retro"] .bingo-input--marked {
+  box-shadow: inset 0 0 0 3px #0f380f;
+}
+
+:root[data-theme="retro"] h1,
+:root[data-theme="retro"] .celebration-text {
+  text-shadow:
+    0.05em 0 0 #0f380f,
+    0.1em 0.05em 0 #0f380f,
+    0.05em 0.1em 0 #0f380f;
+}
+
+/* Persona: halftone dots, a slanted title and squares knocked askew.
+   Rotation, not clip-path, which would cut off outlines and the room's
+   editor labels */
+:root[data-theme="persona"] {
+  background-image: repeating-linear-gradient(-55deg, transparent 0 40px, rgb(229 25 28 / 0.12) 40px 80px);
+}
+
+:root[data-theme="persona"] .bingo-card {
+  border-radius: 0;
+  background-color: var(--card-bg);
+  background-image: radial-gradient(rgb(0 0 0 / 0.22) 1.5px, transparent 2px);
+  background-size: 9px 9px;
+  box-shadow: -10px 10px 0 #000, -10px 10px 0 3px #fff;
+}
+
+:root[data-theme="persona"] h1 {
+  rotate: -3deg;
+  font-style: italic;
+  text-shadow:
+    -0.04em 0.04em 0 #000,
+    -0.08em 0.08em 0 #fff,
+    -0.12em 0.12em 0 #000;
+}
+
+:root[data-theme="persona"] .bingo-input {
+  border-radius: 0;
+  rotate: -2deg;
+}
+
+:root[data-theme="persona"] .bingo-input:nth-child(3n) {
+  rotate: 2.5deg;
+}
+
+:root[data-theme="persona"] .bingo-input:nth-child(3n + 1) {
+  rotate: 1deg;
+}
+
+:root[data-theme="persona"] .bingo-input--marked {
+  box-shadow: none;
+}
+
+/* The marks are black, like the page */
+:root[data-theme="persona"] .button-primary {
+  --button-depth: #000;
+  background-color: #fff;
+  color: #000;
+}
+
+/* Zelda: a gold double border and parchment squares */
+:root[data-theme="zelda"] .bingo-card {
+  border: 3px double #f5c94a;
+  box-shadow: 0 0 0 4px #0b1d13, 0 0 0 6px #8a6a1a;
+}
+
+:root[data-theme="zelda"] h1 {
+  letter-spacing: 0.04em;
+}
+
+:root[data-theme="zelda"] .bingo-input {
+  box-shadow: inset 0 0 10px rgb(138 106 26 / 0.45);
+}
+
+:root[data-theme="zelda"] .bingo-input--marked {
+  box-shadow: inset 0 0 0 2px #f5c94a;
+}
+
+/* Mega Man: a light blue frame */
+:root[data-theme="mega-man"] .bingo-card {
+  border: 4px solid #3cbcfc;
+  box-shadow: 0 0 0 4px #00288c;
+}
+
+/* Splatoon: ink on the page and an ink-blot card */
+:root[data-theme="splatoon"] {
+  background-image:
+    radial-gradient(circle at 12% 18%, rgb(255 107 0 / 0.2) 0 60px, transparent 61px),
+    radial-gradient(circle at 88% 72%, rgb(198 255 0 / 0.12) 0 90px, transparent 91px),
+    radial-gradient(circle at 75% 12%, rgb(255 107 0 / 0.15) 0 24px, transparent 25px);
+}
+
+:root[data-theme="splatoon"] .bingo-card {
+  border-radius: 40px 70px 30px 60px / 60px 34px 70px 40px;
+}
+
+:root[data-theme="splatoon"] h1 {
+  rotate: -2deg;
+}
+
+:root[data-theme="splatoon"] .bingo-input {
+  border-radius: 14px 8px 16px 6px;
+}
+
+:root[data-theme="splatoon"] .bingo-input--marked {
+  box-shadow: inset 0 0 0 3px #ff6b00;
+}
+
+/* Animal Crossing: a dotted page and a stitched, rounded card */
+:root[data-theme="animal-crossing"] {
+  background-image: radial-gradient(rgb(120 200 80 / 0.3) 3px, transparent 3.5px);
+  background-size: 28px 28px;
+}
+
+:root[data-theme="animal-crossing"] .bingo-card {
+  border-radius: 32px;
+  outline: 2px dashed rgb(255 255 255 / 0.7);
+  outline-offset: -10px;
+  box-shadow: 0 8px 0 #5aa33a;
+}
+
+:root[data-theme="animal-crossing"] .bingo-input {
+  border-radius: 14px;
+}
+
+:root[data-theme="animal-crossing"] .bingo-input--marked {
+  box-shadow: inset 0 0 0 3px #e0a92e;
+}
+
+/* Steam: the store's gradient and a glow on marked squares */
+:root[data-theme="steam"] .bingo-card {
+  border-radius: 4px;
+  background-image: linear-gradient(160deg, #2a475e, #1b2838 60%);
+  box-shadow: 0 10px 30px rgb(0 0 0 / 0.5);
+}
+
+:root[data-theme="steam"] .bingo-input {
+  border-radius: 2px;
+}
+
+:root[data-theme="steam"] .bingo-input--marked {
+  box-shadow: 0 0 12px rgb(102 192 244 / 0.7);
+}
+
+:root[data-theme="steam"] .button {
+  border-radius: 2px;
+}
+
+:root[data-theme="steam"] .button:not(.button-primary) {
+  background-color: #2a475e;
+}
